@@ -1,10 +1,10 @@
-import { useEffect, type PropsWithChildren } from 'react';
-import { useUserStore } from '../stores/user';
+import { useEffect, type PropsWithChildren } from 'react'
+import { useUserStore } from '../stores/user'
 
 export function AuthProvider({ children }: PropsWithChildren) {
   useEffect(() => {
-    useUserStore.getState().initializeFromStorage();
-  }, []);
+    useUserStore.getState().initializeFromStorage()
+  }, [])
 
-  return children;
+  return children
 }

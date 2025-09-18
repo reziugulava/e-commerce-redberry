@@ -1,8 +1,8 @@
-import { Link } from 'react-router-dom';
-import type { ReactNode } from 'react';
+import { Link } from 'react-router-dom'
+import type { ReactNode } from 'react'
 
 interface HeaderProps {
-  children?: ReactNode;
+  children?: ReactNode
 }
 
 export function Header({ children }: HeaderProps) {
@@ -19,5 +19,5 @@ export function Header({ children }: HeaderProps) {
         </nav>
       </div>
     </header>
-  );
+  )
 }

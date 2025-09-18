@@ -1,11 +1,11 @@
-import { Link, Outlet } from 'react-router-dom';
-import { Header } from '@/components/navigation/header';
-import { UserNav } from '@/features/auth/components/user-nav';
-import { useUserStore } from '@/features/auth/stores/user';
-import { Button } from '@/components/ui/button';
+import { Link, Outlet } from 'react-router-dom'
+import { Header } from '@/components/navigation/header'
+import { UserNav } from '@/features/auth/components/user-nav'
+import { useUserStore } from '@/features/auth/stores/user'
+import { Button } from '@/components/ui/button'
 
 export default function RootLayout() {
-  const user = useUserStore((state) => state.user);
+  const user = useUserStore(state => state.user)
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -37,5 +37,5 @@ export default function RootLayout() {
         </div>
       </footer>
     </div>
-  );
+  )
 }
