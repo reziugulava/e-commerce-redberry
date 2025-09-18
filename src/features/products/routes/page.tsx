@@ -1,11 +1,8 @@
 import { useSearchParams } from 'react-router-dom'
-import type {
-  ProductFilters,
-  ProductSort,
-} from '@/features/products/types/product'
-import { ProductGrid } from '@/features/products/components/product-grid'
-import { ProductFilters as Filters } from '@/features/products/components/product-filters'
-import { useProducts } from '@/features/products/hooks/use-products'
+import type { ProductFilters, ProductSort } from '../types/product'
+import { ProductGrid } from '../components/product-grid'
+import { ProductFilters as Filters } from '../components/product-filters'
+import { useProducts } from '../hooks/use-products'
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -45,6 +42,14 @@ export default function ProductsPage() {
     const params = new URLSearchParams(searchParams)
     params.set('sort', newSort)
     setSearchParams(params)
+  }
+
+  if (isLoading) {
+    return (
+      <div className="container py-8">
+        <p>Loading...</p>
+      </div>
+    )
   }
 
   return (
