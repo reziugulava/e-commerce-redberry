@@ -6,6 +6,8 @@ import type {
 import { ProductGrid } from '@/features/products/components/product-grid'
 import { ProductFilters as Filters } from '@/features/products/components/product-filters'
 import { useProducts } from '@/features/products/hooks/use-products'
+import { ResultsCounter } from '@/features/products/components/results-counter'
+import { Pagination } from '@/features/products/components/pagination'
 
 export default function ProductsPage() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -47,6 +49,14 @@ export default function ProductsPage() {
     setSearchParams(params)
   }
 
+  const handlePageChange = (newPage: number) => {
+    const params = new URLSearchParams(searchParams)
+    params.set('page', newPage.toString())
+    setSearchParams(params)
+  }
+
+  const totalPages = products?.meta.last_page ?? 1
+
   return (
     <div className="container py-8">
       <h1 className="mb-8 text-3xl font-bold">Products</h1>
@@ -58,7 +68,30 @@ export default function ProductsPage() {
         onSortChange={handleSortChange}
       />
 
+      <div className="mb-4 flex items-center justify-between">
+        <ResultsCounter
+          currentPage={Number(page) || 1}
+          perPage={products?.meta.per_page ?? 0}
+          totalResults={products?.meta.total ?? 0}
+        />
+      </div>
+
       {products?.data && <ProductGrid products={products.data} />}
+
+      {isLoading && (
+        <div className="container py-8">
+          <p>Loading...</p>
+        </div>
+      )}
+      {totalPages > 1 && (
+        <div className="mt-8">
+          <Pagination
+            currentPage={Number(page) || 1}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+          />
+        </div>
+      )}
     </div>
   )
 }

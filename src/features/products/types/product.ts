@@ -36,7 +36,11 @@ export interface ProductsResponse {
   meta: {
     current_page: number
     per_page: number
+    from: number
     to: number
+    total: number
+    last_page: number
+    links: { url: string | null; label: string; active: boolean }[]
   }
 }
 
