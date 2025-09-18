@@ -1,0 +1,168 @@
+# E-commerce Website Development Plan
+
+## Overview
+This document outlines a comprehensive plan for building a modern e-commerce website using React, Tailwind CSS, shadcn/ui components, TanStack Query, and Axios. The architecture follows the Bulletproof React feature-based approach.
+
+## Tech Stack
+- **Frontend Framework**: React with TypeScript
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **State Management**: TanStack Query & Context/Zustand
+- **API Client**: Axios
+- **Routing**: React Router DOM
+
+## 1. Project Structure
+The project follows a feature-based architecture with clear separation of concerns:
+
+```
+src/
+├── app/                  # Application-level wrappers
+│   ├── routes/          # React Router config (pages)
+│   ├── app.tsx         # Main App component
+│   ├── provider.tsx    # App providers configuration
+│   └── router.tsx      # Router definitions
+│
+├── assets/             # Static assets (fonts, images)
+├── components/         # Shared UI components
+├── config/            # Environment & theme configuration
+├── features/          # Domain-specific features
+│   ├── auth/
+│   ├── products/
+│   └── cart/
+├── hooks/             # Shared hooks
+├── lib/              # Reusable libraries
+├── stores/           # Global stores
+├── types/            # Global TypeScript types
+└── utils/            # Common utilities
+```
+
+## 2. Core Features
+
+### Authentication (auth/)
+- **API Layer**: `login.ts`, `register.ts`
+- **Hooks**: `useLogin()`, `useRegister()`
+- **Components**: `LoginForm.tsx`, `RegisterForm.tsx`
+- **Functionality**: JWT-based authentication flow
+
+### Products Management (products/)
+- **API Layer**: `getProducts.ts`, `getProduct.ts`
+- **Hooks**: `useProducts()`, `useProduct()`
+- **Components**: 
+  - `ProductCard.tsx`
+  - `ProductGrid.tsx`
+  - `ProductFilters.tsx`
+  - `ProductDetail.tsx`
+- **Features**: Filtering, pagination, search
+
+### Shopping Cart (cart/)
+- **API Layer**: CRUD operations for cart management
+- **Hooks**: `useCart()`, `useAddToCart()`, etc.
+- **Components**:
+  - `CartSidebar.tsx`
+  - `CartPage.tsx`
+  - `CartItem.tsx`
+- **Store**: Local cart state management
+
+### Layout & Navigation
+- **Components**:
+  - `Navbar.tsx`: Main navigation with search, auth, cart
+  - `Footer.tsx`: Site footer
+  - `Sidebar.tsx`: Mobile navigation and cart
+
+## 3. Custom Hooks Implementation
+
+### API Hooks
+- **useAxios()**: Configured Axios instance
+- **Auth Hooks**: Authentication mutations
+- **Product Hooks**: Product queries and filters
+- **Cart Hooks**: Cart operations and state
+
+### Utility Hooks
+- **usePagination()**: Page navigation
+- **useDebounce()**: Search input handling
+- **useAuth()**: Authentication state
+- **useFilters()**: Filter state management
+
+## 4. Routing Structure
+
+```typescript
+// Main Routes
+/                 # Home/Landing
+/login           # Login page
+/register        # Registration
+/products        # Product listing
+/product/:id     # Product details
+/cart            # Shopping cart
+*                # 404 page
+```
+
+## 5. Implementation Plan
+
+### Phase 1: Initial Setup
+1. Project scaffolding with Vite
+2. Dependencies installation
+3. Tailwind & shadcn/ui configuration
+4. Base project structure setup
+
+### Phase 2: UI Components
+1. Install shadcn components
+2. Create shared UI components
+3. Implement layout components
+4. Setup theme configuration
+
+### Phase 3: Feature Development
+1. Build authentication system
+2. Implement product browsing
+3. Develop shopping cart
+4. Add search and filtering
+
+### Phase 4: Integration & Polish
+1. Connect API endpoints
+2. Implement state management
+3. Add loading states
+4. Error handling
+5. Mobile responsiveness
+
+## Development Commands
+
+```bash
+# Project Setup
+npm create vite@latest my-shop --template react-ts
+
+# Dependencies
+npm install react-router-dom @tanstack/react-query axios tailwindcss postcss autoprefixer
+
+# shadcn/ui Setup
+npx shadcn-ui@latest init
+
+# UI Components
+npx shadcn-ui@latest add button
+npx shadcn-ui@latest add input
+npx shadcn-ui@latest add form
+# ... other components as needed
+```
+
+## Best Practices
+
+1. **API Handling**
+   - Single Axios instance
+   - Type-safe API calls
+   - Proper error handling
+
+2. **State Management**
+   - Server state with TanStack Query
+   - UI state with context/Zustand
+   - Proper cache invalidation
+
+3. **Component Structure**
+   - Feature-based organization
+   - Shared components abstraction
+   - Proper prop typing
+
+4. **Performance**
+   - Lazy loading for routes
+   - Proper query caching
+   - Image optimization
+   - Bundle size management
+
+This architecture ensures a scalable, maintainable, and performant e-commerce application following industry best practices and modern React patterns.
