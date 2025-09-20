@@ -1,3 +1,15 @@
+export interface ProductColor {
+  id: number
+  name: string
+  value: string
+}
+
+export interface ProductSize {
+  id: number
+  name: string
+  value: string
+}
+
 export interface Product {
   id: number
   name: string
@@ -9,6 +21,11 @@ export interface Product {
   total_price: number
   quantity: number
   brand: Brand
+  colors: ProductColor[]
+  available_colors: string[]
+  sizes: ProductSize[]
+  available_sizes: string[]
+  available_quantity: number
 }
 
 export interface Brand {

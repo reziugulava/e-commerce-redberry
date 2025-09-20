@@ -68,8 +68,8 @@ export const ProductFilters = ({
           <SelectContent>
             <SelectItem value="price">Price: Low to High</SelectItem>
             <SelectItem value="-price">Price: High to Low</SelectItem>
-            <SelectItem value="created_at">Newest First</SelectItem>
-            <SelectItem value="-created_at">Oldest First</SelectItem>
+            <SelectItem value="-created_at">Newest First</SelectItem>
+            <SelectItem value="created_at">Oldest First</SelectItem>
           </SelectContent>
         </Select>
       </div>

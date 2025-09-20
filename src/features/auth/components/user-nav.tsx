@@ -9,7 +9,6 @@ import {
 import { Button } from '@/components/ui/button'
 import { useLogout } from '../hooks/use-auth'
 import { useUserStore } from '../stores/user'
-import { Link } from 'react-router-dom'
 
 export function UserNav() {
   const user = useUserStore(state => state.user)
