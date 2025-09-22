@@ -3,12 +3,11 @@ import { lazy, Suspense } from 'react'
 import RootLayout from './routes/root'
 
 // Lazy load page components
-const HomePage = lazy(() => import('./routes/home/page'))
 const LoginPage = lazy(() => import('./routes/auth/login'))
 const RegisterPage = lazy(() => import('./routes/auth/register'))
 const ProductsPage = lazy(() => import('./routes/products/page'))
 const ProductDetailPage = lazy(() => import('./routes/products/[id]'))
-const CartPage = lazy(() => import('./routes/cart/page'))
+const CheckoutPage = lazy(() => import('./routes/checkout/page'))
 const NotFoundPage = lazy(() => import('./routes/not-found'))
 
 // Loading component
@@ -28,7 +27,7 @@ export const router = createBrowserRouter([
         index: true,
         element: (
           <Suspense fallback={<PageLoader />}>
-            <HomePage />
+            <ProductsPage />
           </Suspense>
         ),
       },
@@ -65,10 +64,10 @@ export const router = createBrowserRouter([
         ),
       },
       {
-        path: 'cart',
+        path: 'checkout',
         element: (
           <Suspense fallback={<PageLoader />}>
-            <CartPage />
+            <CheckoutPage />
           </Suspense>
         ),
       },

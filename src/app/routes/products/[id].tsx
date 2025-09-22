@@ -4,15 +4,14 @@ import { useState, useEffect, useMemo } from 'react'
 import { ProductGallery } from '@/features/products/components/product-gallery'
 import { ProductOptions } from '@/features/products/components/product-options'
 import { ColorSwatches } from '@/features/products/components/color-swatches'
+import { useCart } from '@/features/cart/hooks/use-cart'
 
-import { useNavigate } from 'react-router-dom'
 import { toast } from 'sonner'
-import { addToCart } from '@/features/cart/api/cart'
 
 export default function ProductDetailPage() {
   const { id } = useParams()
-  const navigate = useNavigate()
   const { data: product, isLoading } = useProduct(Number(id))
+  const { addToCart, isAddingToCart } = useCart()
   const [selectedColor, setSelectedColor] = useState<string>()
 
   // Initialize with the first available color
@@ -72,15 +71,18 @@ export default function ProductDetailPage() {
     )
   }
 
-  const handleAddToCart = async (options: {
+  const handleAddToCart = (options: {
     color: string
     size: string
     quantity: number
   }) => {
     try {
-      await addToCart(product.id, options)
+      addToCart({
+        productId: product.id,
+        payload: options,
+      })
       toast.success('Added to cart!')
-      navigate('/cart')
+      // Stay on current page - user can access cart via sidebar
     } catch (error) {
       console.error('Failed to add to cart:', error)
       toast.error('Failed to add to cart. Please try again.')
@@ -142,6 +144,7 @@ export default function ProductDetailPage() {
             selectedColor={selectedColor}
             availableColors={product.available_colors}
             availableSizes={product.available_sizes}
+            isLoading={isAddingToCart}
           />
         </div>
       </div>

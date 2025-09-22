@@ -2,6 +2,7 @@ import { create } from 'zustand'
 import { devtools } from 'zustand/middleware'
 import type { CartStore } from '../types/store'
 import type { AddToCartPayload, CartItem } from '../api/cart'
+import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 import {
   addToCart,
   checkout as checkoutAPI,
@@ -95,10 +96,10 @@ export const useCartStore = create<CartStore>()(
       }
     },
 
-    checkout: async () => {
+    checkout: async (checkoutData: CheckoutFormData) => {
       set({ isCheckingOut: true, error: null })
       try {
-        await checkoutAPI()
+        await checkoutAPI(checkoutData)
         // Clear cart after successful checkout
         set({ items: [] })
         get().updateTotals([])

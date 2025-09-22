@@ -1,4 +1,5 @@
 import type { CartItem } from '../api/cart'
+import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 
 export interface CartStore {
   // State
@@ -29,7 +30,7 @@ export interface CartStore {
   ) => Promise<void>
   updateItem: (productId: number, quantity: number) => Promise<void>
   removeItem: (productId: number) => Promise<void>
-  checkout: () => Promise<void>
+  checkout: (checkoutData: CheckoutFormData) => Promise<void>
   clearCart: () => void
   clearError: () => void
 }

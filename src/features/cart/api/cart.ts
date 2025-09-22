@@ -1,9 +1,21 @@
 import { api } from '@/lib/api/axios'
 import type { Product } from '@/features/products/types/product'
+import type { CheckoutFormData } from '@/features/checkout/types/checkout'
+
+interface AxiosErrorResponse {
+  response?: {
+    status?: number
+    statusText?: string
+    data?: {
+      message?: string
+    }
+  }
+  message?: string
+}
 
 export interface CartItem extends Pick<Product, 'id' | 'name' | 'price'> {
   quantity: number
-  brand: {
+  brand?: {
     id: number
     name: string
   }
@@ -62,11 +74,48 @@ export const getCart = async (): Promise<CartItem[]> => {
 
 /**
  * Checkout all items in the cart
+ * @param checkoutData The checkout form data with user information
  * @returns Success message
  * @throws 400 Bad Request - Cart is empty or other error
  * @throws 401 Unauthorized - User is not authenticated
+ * @throws 422 Unprocessable Content - Missing required fields
  */
-export const checkout = async (): Promise<{ message: string }> => {
-  const { data } = await api.post('/cart/checkout')
-  return data
+export const checkout = async (
+  checkoutData: CheckoutFormData
+): Promise<{ message: string }> => {
+  try {
+    console.log('Starting checkout API call with data:', checkoutData)
+
+    // Transform our form data to match API expectations
+    const apiData = {
+      name: checkoutData.firstName,
+      surname: checkoutData.lastName,
+      email: checkoutData.email,
+      address: checkoutData.address,
+      zip_code: checkoutData.zipCode,
+    }
+
+    console.log('Sending to API:', apiData)
+    const { data } = await api.post('/cart/checkout', apiData)
+    console.log('Checkout successful:', data)
+    return data
+  } catch (error: unknown) {
+    const axiosError = error as AxiosErrorResponse
+    console.error('Checkout error details:', {
+      status: axiosError.response?.status,
+      statusText: axiosError.response?.statusText,
+      data: axiosError.response?.data,
+      message: axiosError.message || 'Unknown error',
+    })
+
+    // Provide more specific error messages based on status code
+    if (axiosError.response?.status === 422) {
+      const errorMessage =
+        axiosError.response?.data?.message ||
+        'Invalid request. Please check your information and try again.'
+      throw new Error(errorMessage)
+    }
+
+    throw error
+  }
 }

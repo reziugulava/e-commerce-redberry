@@ -1,4 +1,5 @@
 import { XIcon } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import {
   Sheet,
   SheetContent,
@@ -17,20 +18,18 @@ interface CartSidebarProps {
 }
 
 export function CartSidebar({ children }: CartSidebarProps) {
-  const {
-    cart,
-    isLoading,
-    updateCartItem,
-    removeFromCart,
-    checkout,
-    isCheckingOut,
-  } = useCart()
+  const navigate = useNavigate()
+  const { cart, isLoading, updateCartItem, removeFromCart } = useCart()
 
   const DELIVERY_FEE = 5
   const subtotal =
     cart?.reduce((total, item) => total + item.price * item.quantity, 0) ?? 0
   const itemCount = cart?.reduce((count, item) => count + item.quantity, 0) ?? 0
   const total = subtotal + (subtotal > 0 ? DELIVERY_FEE : 0) // Only add delivery fee if cart is not empty
+
+  const handleCheckout = () => {
+    navigate('/checkout')
+  }
 
   return (
     <Sheet>
@@ -124,15 +123,15 @@ export function CartSidebar({ children }: CartSidebarProps) {
                   <span>{formatPrice(total)}</span>
                 </div>
               </div>
-              <Button
-                className="w-full"
-                onClick={() => checkout()}
-                disabled={isCheckingOut || total === 0}
-              >
-                {isCheckingOut
-                  ? 'Processing...'
-                  : `Checkout • ${formatPrice(total)}`}
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  className="w-full"
+                  onClick={handleCheckout}
+                  disabled={total === 0}
+                >
+                  Checkout • {formatPrice(total)}
+                </Button>
+              </div>
             </div>
           </>
         )}

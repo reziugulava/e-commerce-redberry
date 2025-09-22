@@ -20,6 +20,7 @@ interface ProductOptionsProps {
   selectedColor?: string
   availableColors?: string[]
   availableSizes?: string[]
+  isLoading?: boolean
 }
 const MAX_QUANTITY = 10
 
@@ -29,6 +30,7 @@ export function ProductOptions({
   selectedColor: initialColor,
   availableColors,
   availableSizes,
+  isLoading = false,
 }: ProductOptionsProps) {
   const [selectedColor, setSelectedColor] = useState<string | undefined>(
     initialColor
@@ -131,11 +133,11 @@ export function ProductOptions({
       {/* Add to Cart Button */}
       <Button
         onClick={handleAddToCart}
-        disabled={!selectedColor || !selectedSize}
+        disabled={!selectedColor || !selectedSize || isLoading}
         className="w-full"
         size="lg"
       >
-        Add to Cart
+        {isLoading ? 'Adding to Cart...' : 'Add to Cart'}
       </Button>
     </div>
   )
