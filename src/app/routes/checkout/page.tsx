@@ -3,22 +3,18 @@ import { useNavigate } from 'react-router-dom'
 import { Button } from '@/components/ui/button'
 import { useCart } from '@/features/cart/hooks/use-cart'
 import { CheckoutSummary } from '@/features/cart/components/checkout-summary'
-import { CheckoutConfirmation } from '@/features/cart/components/checkout-confirmation'
 import { CheckoutForm } from '@/features/checkout/components/checkout-form'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 import { useUserStore } from '@/features/auth/stores/user'
 import { ArrowLeft, ShoppingCart, AlertCircle, X } from 'lucide-react'
+import { toast } from 'sonner'
 
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const { cart = [], checkout, isCheckingOut, checkoutError } = useCart()
   const { user, token } = useUserStore()
 
-  const [showConfirmation, setShowConfirmation] = useState(false)
-  const [orderTotal, setOrderTotal] = useState(0)
   const [localError, setLocalError] = useState<string | null>(null)
-  const [checkoutFormData, setCheckoutFormData] =
-    useState<CheckoutFormData | null>(null)
 
   const calculateTotal = useCallback(() => {
     const subtotal = cart.reduce(
@@ -36,33 +32,9 @@ export default function CheckoutPage() {
     }
   }, [token, navigate])
 
-  // Monitor checkout completion
-  useEffect(() => {
-    let timeoutId: NodeJS.Timeout
-
-    if (isCheckingOut) {
-      // Set a timeout to check if checkout was successful
-      timeoutId = setTimeout(() => {
-        if (!isCheckingOut && !checkoutError && cart.length === 0) {
-          // Checkout was successful (cart is empty and no error)
-          const total = orderTotal || calculateTotal()
-          setOrderTotal(total)
-          setShowConfirmation(true)
-        }
-      }, 1000)
-    }
-
-    return () => {
-      if (timeoutId) {
-        clearTimeout(timeoutId)
-      }
-    }
-  }, [isCheckingOut, checkoutError, cart.length, orderTotal, calculateTotal])
-
   const onCheckout = async (formData: CheckoutFormData) => {
     setLocalError(null)
     const total = calculateTotal()
-    setOrderTotal(total)
 
     console.log('Cart items before checkout:', cart)
     console.log('Cart length:', cart.length)
@@ -78,7 +50,26 @@ export default function CheckoutPage() {
     }
 
     try {
-      checkout(formData)
+      await checkout(formData)
+
+      // Show immediate success toast
+      toast.success('🎉 Order Confirmed!', {
+        description: `Your order for $${total.toFixed(2)} has been successfully processed. Thank you for your purchase!`,
+        action: {
+          label: 'Continue Shopping',
+          onClick: () => navigate('/products'),
+        },
+        duration: 8000,
+      })
+
+      // Store checkout data for reference
+      localStorage.setItem('lastOrderTotal', total.toString())
+      localStorage.setItem('lastCheckoutData', JSON.stringify(formData))
+
+      // Redirect to products after a short delay
+      setTimeout(() => {
+        navigate('/products')
+      }, 3000)
     } catch (error: unknown) {
       console.error('Checkout failed:', error)
       const errorMessage =
@@ -86,14 +77,17 @@ export default function CheckoutPage() {
           ? error.message
           : 'Failed to process checkout. Please try again.'
       setLocalError(errorMessage)
+
+      // Show error toast as well
+      toast.error('Checkout Failed', {
+        description: errorMessage,
+        duration: 5000,
+      })
     }
   }
 
   const handleCheckoutFormSubmit = (formData: CheckoutFormData) => {
-    // Store the form data locally for order confirmation
-    setCheckoutFormData(formData)
-
-    // Also store in localStorage for persistence
+    // Store the form data locally for reference
     localStorage.setItem('checkoutFormData', JSON.stringify(formData))
 
     // Proceed with checkout, passing the form data
@@ -228,14 +222,6 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
-
-      {/* Confirmation Modal */}
-      <CheckoutConfirmation
-        isOpen={showConfirmation}
-        onClose={() => setShowConfirmation(false)}
-        orderTotal={orderTotal}
-        checkoutData={checkoutFormData || undefined}
-      />
     </div>
   )
 }

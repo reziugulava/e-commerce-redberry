@@ -10,9 +10,9 @@ export const ProductCard = ({ product }: ProductCardProps) => {
   return (
     <Link
       to={`/products/${product.id}`}
-      className="group rounded-lg border p-4 transition-all hover:shadow-lg"
+      className="group rounded-lg bg-gray-50 p-4 transition-all hover:shadow-lg"
     >
-      <div className="aspect-square overflow-hidden rounded-md bg-gray-50">
+      <div className="aspect-square overflow-hidden rounded-md bg-transparent">
         <img
           src={product.cover_image}
           alt={product.name}

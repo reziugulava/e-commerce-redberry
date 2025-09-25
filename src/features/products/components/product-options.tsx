@@ -72,13 +72,12 @@ export function ProductOptions({
               />
               <Label
                 htmlFor={`color-${index}`}
-                className="flex cursor-pointer items-center gap-2 rounded-md border px-3 py-2 peer-aria-checked:border-primary peer-aria-checked:bg-primary/5"
+                className="cursor-pointer rounded-full border-2 p-1 peer-aria-checked:border-primary peer-aria-checked:ring-2 peer-aria-checked:ring-primary/20"
               >
                 <div
-                  className="h-4 w-4 rounded-full border"
+                  className="h-6 w-6 rounded-full border"
                   style={{ backgroundColor: color.toLowerCase() }}
                 />
-                {color}
               </Label>
             </div>
           ))}
@@ -134,7 +133,7 @@ export function ProductOptions({
       <Button
         onClick={handleAddToCart}
         disabled={!selectedColor || !selectedSize || isLoading}
-        className="w-full"
+        className="w-full bg-orange-600 hover:bg-orange-700 text-white"
         size="lg"
       >
         {isLoading ? 'Adding to Cart...' : 'Add to Cart'}

@@ -44,15 +44,11 @@ export default function RootLayout() {
           )}
         </Header>
 
-        <main className="flex-1">
-          <Outlet />
-        </main>
-
-        <footer className="border-t">
-          <div className="container mx-auto p-4 text-center">
-            <p>© 2025 E-Commerce Store. All rights reserved.</p>
+        <main className="flex-1 pt-16">
+          <div className="container mx-auto px-4">
+            <Outlet />
           </div>
-        </footer>
+        </main>
       </div>
     </CartProvider>
   )

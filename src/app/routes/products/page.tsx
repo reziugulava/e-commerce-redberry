@@ -5,6 +5,7 @@ import type {
 } from '@/features/products/types/product'
 import { ProductGrid } from '@/features/products/components/product-grid'
 import { ProductFilters as Filters } from '@/features/products/components/product-filters'
+import { FilterSummary } from '@/features/products/components/filter-summary'
 import { useProducts } from '@/features/products/hooks/use-products'
 import { ResultsCounter } from '@/features/products/components/results-counter'
 import { Pagination } from '@/features/products/components/pagination'
@@ -43,9 +44,13 @@ export default function ProductsPage() {
     setSearchParams(params)
   }
 
-  const handleSortChange = (newSort: ProductSort) => {
+  const handleSortChange = (newSort: ProductSort | undefined) => {
     const params = new URLSearchParams(searchParams)
-    params.set('sort', newSort)
+    if (newSort) {
+      params.set('sort', newSort)
+    } else {
+      params.delete('sort')
+    }
     setSearchParams(params)
   }
 
@@ -58,28 +63,33 @@ export default function ProductsPage() {
   const totalPages = products?.meta.last_page ?? 1
 
   return (
-    <div className="container py-8">
-      <h1 className="mb-8 text-3xl font-bold">Products</h1>
+    <div className="py-8">
+      {/* Header row with Products title, results counter, filter, and sort */}
+      <div className="mb-4 flex items-center justify-between gap-4">
+        <h1 className="text-3xl font-bold">Products</h1>
 
-      <Filters
-        filters={filters}
-        sort={sort ?? undefined}
-        onFilterChange={handleFilterChange}
-        onSortChange={handleSortChange}
-      />
-
-      <div className="mb-4 flex items-center justify-between">
-        <ResultsCounter
-          currentPage={Number(page) || 1}
-          perPage={products?.meta.per_page ?? 0}
-          totalResults={products?.meta.total ?? 0}
-        />
+        <div className="flex items-center gap-4">
+          <ResultsCounter
+            currentPage={Number(page) || 1}
+            perPage={products?.meta.per_page ?? 0}
+            totalResults={products?.meta.total ?? 0}
+          />
+          <Filters
+            filters={filters}
+            sort={sort ?? undefined}
+            onFilterChange={handleFilterChange}
+            onSortChange={handleSortChange}
+          />
+        </div>
       </div>
+
+      {/* Filter Summary */}
+      <FilterSummary filters={filters} onFilterChange={handleFilterChange} />
 
       {products?.data && <ProductGrid products={products.data} />}
 
       {isLoading && (
-        <div className="container py-8">
+        <div className="py-8">
           <p>Loading...</p>
         </div>
       )}

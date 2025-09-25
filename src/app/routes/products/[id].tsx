@@ -3,7 +3,6 @@ import { useProduct } from '@/features/products/hooks/use-products'
 import { useState, useEffect, useMemo } from 'react'
 import { ProductGallery } from '@/features/products/components/product-gallery'
 import { ProductOptions } from '@/features/products/components/product-options'
-import { ColorSwatches } from '@/features/products/components/color-swatches'
 import { useCart } from '@/features/cart/hooks/use-cart'
 
 import { toast } from 'sonner'
@@ -112,32 +111,6 @@ export default function ProductDetailPage() {
             </div>
           </div>
 
-          <div className="prose max-w-none">
-            <p>{product.description}</p>
-          </div>
-
-          {/* Color Swatches */}
-          <div className="space-y-4">
-            <h3 className="font-medium">Available Colors</h3>
-            <ColorSwatches
-              colors={product.available_colors}
-              selectedColor={selectedColor || ''}
-              onColorChange={setSelectedColor}
-              colorImages={{
-                [product.available_colors[0].toLowerCase()]:
-                  product.cover_image,
-                ...Object.fromEntries(
-                  product.available_colors
-                    .slice(1)
-                    .map((color, index) => [
-                      color.toLowerCase(),
-                      product.images[index + 1],
-                    ])
-                ),
-              }}
-            />
-          </div>
-
           <ProductOptions
             onAddToCart={handleAddToCart}
             onColorChange={setSelectedColor}
@@ -146,6 +119,28 @@ export default function ProductDetailPage() {
             availableSizes={product.available_sizes}
             isLoading={isAddingToCart}
           />
+
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-semibold">Details</h3>
+              <img
+                src={product.brand.image}
+                alt={product.brand.name}
+                className="h-8 w-8 rounded-full"
+              />
+            </div>
+
+            <div className="space-y-2">
+              <div className="flex items-center gap-2">
+                <span className="font-medium text-gray-700">Brand:</span>
+                <span className="font-medium">{product.brand.name}</span>
+              </div>
+
+              <div className="prose max-w-none">
+                <p className="text-gray-600">{product.description}</p>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
