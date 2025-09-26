@@ -1,6 +1,7 @@
 import { api } from '@/lib/api/axios'
 import type { Product } from '@/features/products/types/product'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
+import { getCartSelection, cleanupCartSelections, removeCartSelection, clearCartSelections } from '../utils/cart-storage'
 
 interface AxiosErrorResponse {
   response?: {
@@ -15,6 +16,9 @@ interface AxiosErrorResponse {
 
 export interface CartItem extends Pick<Product, 'id' | 'name' | 'price'> {
   quantity: number
+  cover_image?: string
+  selected_color?: string
+  selected_size?: string
   brand?: {
     id: number
     name: string
@@ -60,6 +64,8 @@ export const updateCartItem = async (
  */
 export const removeFromCart = async (productId: number): Promise<void> => {
   await api.delete(`/cart/products/${productId}`)
+  // Also remove from localStorage
+  removeCartSelection(productId)
 }
 
 /**
@@ -69,7 +75,23 @@ export const removeFromCart = async (productId: number): Promise<void> => {
  */
 export const getCart = async (): Promise<CartItem[]> => {
   const { data } = await api.get('/cart')
-  return data
+  
+  // Merge API data with localStorage selections
+  const enrichedCart = data.map((item: CartItem) => {
+    const selection = getCartSelection(item.id)
+    return {
+      ...item,
+      cover_image: selection?.cover_image || item.cover_image,
+      selected_color: selection?.selected_color,
+      selected_size: selection?.selected_size,
+    }
+  })
+  
+  // Clean up localStorage for items no longer in cart
+  const activeProductIds = data.map((item: CartItem) => item.id)
+  cleanupCartSelections(activeProductIds)
+  
+  return enrichedCart
 }
 
 /**
@@ -84,8 +106,6 @@ export const checkout = async (
   checkoutData: CheckoutFormData
 ): Promise<{ message: string }> => {
   try {
-    console.log('Starting checkout API call with data:', checkoutData)
-
     // Transform our form data to match API expectations
     const apiData = {
       name: checkoutData.firstName,
@@ -95,9 +115,11 @@ export const checkout = async (
       zip_code: checkoutData.zipCode,
     }
 
-    console.log('Sending to API:', apiData)
     const { data } = await api.post('/cart/checkout', apiData)
-    console.log('Checkout successful:', data)
+    
+    // Clear localStorage selections after successful checkout
+    clearCartSelections()
+    
     return data
   } catch (error: unknown) {
     const axiosError = error as AxiosErrorResponse

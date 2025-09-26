@@ -28,4 +28,9 @@ export const authApi = {
     })
     return response.data
   },
+
+  getCurrentUser: async () => {
+    const response = await api.get('/user')
+    return response.data
+  },
 }

@@ -1,4 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
+import { toast } from 'sonner'
 import {
   addToCart,
   checkout,
@@ -7,16 +9,31 @@ import {
   updateCartItem,
 } from '../api/cart'
 import type { AddToCartPayload, CartItem } from '../api/cart'
+import { useUserStore } from '@/features/auth/stores/user'
+import { setCartSelection } from '../utils/cart-storage'
 
 export const CART_QUERY_KEY = ['cart']
 
 export function useCart() {
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
+  const user = useUserStore(state => state.user)
+
+  // Helper function to check authentication and redirect if needed
+  const checkAuthAndRedirect = () => {
+    if (!user) {
+      toast.info('Please log in to add items to your cart')
+      navigate('/login')
+      return false
+    }
+    return true
+  }
 
   // Fetch cart
   const { data: cart, isLoading } = useQuery({
     queryKey: CART_QUERY_KEY,
     queryFn: getCart,
+    enabled: !!user, // Only fetch cart if user is authenticated
   })
 
   // Add to cart mutation
@@ -24,10 +41,32 @@ export function useCart() {
     mutationFn: ({
       productId,
       payload,
+      productData,
     }: {
       productId: number
       payload: AddToCartPayload
-    }) => addToCart(productId, payload),
+      productData?: {
+        cover_image?: string
+        selected_color?: string
+        selected_size?: string
+      }
+    }) => {
+      if (!checkAuthAndRedirect()) {
+        throw new Error('Authentication required')
+      }
+      
+      // Store product selection data in localStorage
+      if (productData) {
+        setCartSelection({
+          productId,
+          selected_color: productData.selected_color,
+          selected_size: productData.selected_size,
+          cover_image: productData.cover_image,
+        })
+      }
+      
+      return addToCart(productId, payload)
+    },
     onMutate: async ({ productId, payload }) => {
       // Cancel outgoing refetches
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
@@ -59,7 +98,11 @@ export function useCart() {
 
       return { previousCart }
     },
-    onError: (_err, _variables, context) => {
+    onError: (error: any, _variables, context) => {
+      // If 401 unauthorized, redirect to login
+      if (error?.response?.status === 401) {
+        navigate('/login')
+      }
       if (context?.previousCart) {
         queryClient.setQueryData(CART_QUERY_KEY, context.previousCart)
       }
@@ -146,13 +189,29 @@ export function useCart() {
     },
   })
 
+  // Wrapper function for addToCart with authentication check
+  const addToCartWithAuthCheck = (params: {
+    productId: number
+    payload: AddToCartPayload
+    productData?: {
+      cover_image?: string
+      selected_color?: string
+      selected_size?: string
+    }
+  }) => {
+    if (!checkAuthAndRedirect()) {
+      return
+    }
+    addToCartMutation.mutate(params)
+  }
+
   return {
     // Cart data
     cart,
     isLoading,
 
     // Mutations
-    addToCart: addToCartMutation.mutate,
+    addToCart: addToCartWithAuthCheck,
     isAddingToCart: addToCartMutation.isPending,
     addToCartError: addToCartMutation.error,
 

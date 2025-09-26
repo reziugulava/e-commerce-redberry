@@ -10,6 +10,7 @@ import {
   removeFromCart,
   updateCartItem,
 } from '../api/cart'
+import { clearCartSelections } from '../utils/cart-storage'
 
 export const useCartStore = create<CartStore>()(
   devtools((set, get) => ({
@@ -112,6 +113,7 @@ export const useCartStore = create<CartStore>()(
 
     clearCart: () => {
       set({ items: [], totalItems: 0, totalPrice: 0 })
+      clearCartSelections()
     },
 
     clearError: () => {

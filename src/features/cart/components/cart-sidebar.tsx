@@ -1,4 +1,3 @@
-import { XIcon } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sheet,
@@ -52,52 +51,93 @@ export function CartSidebar({ children }: CartSidebarProps) {
             <ScrollArea className="flex-1 -mx-6 px-6">
               <div className="space-y-4 py-4">
                 {cart?.map(item => (
-                  <div key={item.id} className="flex items-start gap-4">
-                    <div className="flex-1 space-y-1">
-                      <h4 className="font-medium leading-none">{item.name}</h4>
-                      <p className="text-sm text-muted-foreground">
-                        {formatPrice(item.price)} × {item.quantity}
-                      </p>
+                  <div key={item.id} className="flex gap-4">
+                    {/* Product Image */}
+                    <div className="flex-shrink-0">
+                      {item.cover_image ? (
+                        <img
+                          src={item.cover_image}
+                          alt={item.name}
+                          className="w-16 h-26 object-cover rounded-md border"
+                        />
+                      ) : (
+                        <div className="w-16 h-26 bg-gray-200 rounded-md border flex items-center justify-center">
+                          <span className="text-xs text-gray-500">No Image</span>
+                        </div>
+                      )}
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1">
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            updateCartItem({
-                              productId: item.id,
-                              quantity: item.quantity - 1,
-                            })
-                          }
-                          disabled={item.quantity <= 1}
-                        >
-                          -
-                        </Button>
-                        <span className="w-8 text-center">{item.quantity}</span>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          className="h-8 w-8"
-                          onClick={() =>
-                            updateCartItem({
-                              productId: item.id,
-                              quantity: item.quantity + 1,
-                            })
-                          }
-                        >
-                          +
-                        </Button>
+                    
+                    {/* Product Details */}
+                    <div className="flex-1 min-w-0">
+                      <div className="space-y-2">
+                        <div className="flex items-center justify-between">
+                          <h4 className="font-medium leading-none text-sm truncate">
+                            {item.name}
+                          </h4>
+                          <p className="text-sm text-muted-foreground">
+                            {formatPrice(item.price)}
+                          </p>
+                        </div>
+                        
+                        {/* Size and Color */}
+                        <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                          {item.selected_size && (
+                            <span>
+                              {item.selected_size}
+                            </span>
+                          )}
+                          {item.selected_color && (
+                            <span>
+                              {item.selected_color}
+                            </span>
+                          )}
+                        </div>
                       </div>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="h-8 w-8"
-                        onClick={() => removeFromCart(item.id)}
-                      >
-                        <XIcon className="h-4 w-4" />
-                      </Button>
+                      
+                      {/* Quantity and Remove Controls */}
+                      <div className="flex items-center justify-between mt-3">
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() =>
+                              updateCartItem({
+                                productId: item.id,
+                                quantity: item.quantity - 1,
+                              })
+                            }
+                            disabled={item.quantity <= 1}
+                          >
+                            -
+                          </Button>
+                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <Button
+                            variant="outline"
+                            size="icon"
+                            className="h-7 w-7"
+                            onClick={() =>
+                              updateCartItem({
+                                productId: item.id,
+                                quantity: item.quantity + 1,
+                              })
+                            }
+                          >
+                            +
+                          </Button>
+                        </div>
+                        
+                        <div className="flex items-center justify-end">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 text-xs"
+                            onClick={() => removeFromCart(item.id)}
+                          >
+                            Remove
+                          </Button>
+                        </div>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -108,12 +148,12 @@ export function CartSidebar({ children }: CartSidebarProps) {
               <Separator />
               <div className="space-y-1.5">
                 <div className="flex justify-between text-sm">
-                  <span>Subtotal</span>
+                  <span>items Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {subtotal > 0 && (
                   <div className="flex justify-between text-sm">
-                    <span>Delivery Fee</span>
+                    <span>Delivery</span>
                     <span>{formatPrice(DELIVERY_FEE)}</span>
                   </div>
                 )}
@@ -125,11 +165,11 @@ export function CartSidebar({ children }: CartSidebarProps) {
               </div>
               <div className="space-y-2">
                 <Button
-                  className="w-full"
+                  className="w-full bg-orange-500 hover:bg-orange-600"
                   onClick={handleCheckout}
                   disabled={total === 0}
                 >
-                  Checkout • {formatPrice(total)}
+                  go to Checkout
                 </Button>
               </div>
             </div>

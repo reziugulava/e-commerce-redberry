@@ -32,6 +32,20 @@ export function useRegister() {
   })
 }
 
+export function useCurrentUser() {
+  const { setUser } = useUserStore()
+
+  return useMutation({
+    mutationFn: () => authApi.getCurrentUser(),
+    onSuccess: data => {
+      // Update user with current profile information
+      if (data) {
+        setUser(data)
+      }
+    },
+  })
+}
+
 export function useLogout() {
   const navigate = useNavigate()
   const logout: () => void = useUserStore(state => state.logout)

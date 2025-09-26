@@ -4,6 +4,7 @@ export interface User {
   username: string
   is_admin: number
   remember_token: string | null
+  profile_photo?: string
 }
 
 export interface AuthResponse {

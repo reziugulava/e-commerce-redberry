@@ -79,8 +79,12 @@ export default function ProductDetailPage() {
       addToCart({
         productId: product.id,
         payload: options,
+        productData: {
+          cover_image: product.cover_image,
+          selected_color: options.color,
+          selected_size: options.size
+        }
       })
-      toast.success('Added to cart!')
       // Stay on current page - user can access cart via sidebar
     } catch (error) {
       console.error('Failed to add to cart:', error)
@@ -98,15 +102,7 @@ export default function ProductDetailPage() {
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold">{product.name}</h1>
-            <div className="mt-4 flex items-center gap-4">
-              <div className="flex items-center gap-2">
-                <img
-                  src={product.brand.image}
-                  alt={product.brand.name}
-                  className="h-8 w-8 rounded-full"
-                />
-                <span className="font-medium">{product.brand.name}</span>
-              </div>
+            <div className="mt-4">
               <div className="text-2xl font-bold">${product.price}</div>
             </div>
           </div>

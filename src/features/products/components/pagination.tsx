@@ -96,12 +96,12 @@ export const Pagination = ({
           return (
             <Button
               key={pageNumber}
-              variant={isCurrentPage ? 'default' : 'outline'}
+              variant="outline"
               size="sm"
               onClick={() => onPageChange(pageNumber)}
               className={`min-w-[2.5rem] ${
                 isCurrentPage
-                  ? 'bg-primary text-primary-foreground'
+                  ? '!border-orange-500 text-orange-500 bg-transparent hover:!border-orange-500 hover:text-orange-500 hover:bg-transparent'
                   : 'hover:bg-gray-100'
               }`}
             >

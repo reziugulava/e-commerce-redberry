@@ -25,7 +25,11 @@ api.interceptors.response.use(
   error => {
     if (error.response?.status === 401) {
       localStorage.removeItem('auth_token')
-      // You might want to redirect to login page here
+      localStorage.removeItem('auth_user')
+      // Redirect to login page
+      if (typeof window !== 'undefined') {
+        window.location.href = '/login'
+      }
     }
     return Promise.reject(error)
   }
