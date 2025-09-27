@@ -13,7 +13,7 @@ export default function ProductDetailPage() {
   const { addToCart, isAddingToCart } = useCart()
   const [selectedColor, setSelectedColor] = useState<string>()
 
-  // Initialize with the first available color
+  // Initialize with the first available color (only if colors are available)
   useEffect(() => {
     if (product?.available_colors?.length && !selectedColor) {
       setSelectedColor(product.available_colors[0])
@@ -22,14 +22,19 @@ export default function ProductDetailPage() {
 
   // Get image for the selected color
   const currentColorImage = useMemo(() => {
-    if (!product || !selectedColor) return null
+    if (!product) return null
+
+    // If no colors available or no color selected, use cover image
+    if (!product.available_colors?.length || !selectedColor) {
+      return product.cover_image
+    }
 
     // Find the index of the selected color
     const colorIndex = product.available_colors.findIndex(
       color => color.toLowerCase() === selectedColor.toLowerCase()
     )
 
-    if (colorIndex === -1) return null
+    if (colorIndex === -1) return product.cover_image
 
     // Each index in the images array corresponds to a color
     return colorIndex === 0 ? product.cover_image : product.images[colorIndex]
@@ -111,8 +116,13 @@ export default function ProductDetailPage() {
         <div className="space-y-8">
           <div>
             <h1 className="text-4xl font-bold">{product.name}</h1>
-            <div className="mt-4">
+            <div className="mt-4 flex items-center gap-4">
               <div className="text-2xl font-bold">${product.price}</div>
+              {(!product.available_colors?.length || !product.available_sizes?.length) && (
+                <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
+                  Out of Stock
+                </span>
+              )}
             </div>
           </div>
 

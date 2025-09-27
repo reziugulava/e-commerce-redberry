@@ -3,7 +3,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
-import { Eye, EyeOff, User } from 'lucide-react'
+import { Eye, EyeOff } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -26,7 +26,6 @@ const loginSchema = z.object({
 export function LoginForm() {
   const { mutate: login, isPending, error } = useLogin()
   const [showPassword, setShowPassword] = useState(false)
-  const [avatarPreview, setAvatarPreview] = useState<string | null>(null)
 
   const form = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
@@ -38,20 +37,6 @@ export function LoginForm() {
 
   const onSubmit = (data: LoginData) => {
     login(data)
-  }
-
-  const handleAvatarChange = (file: File | null) => {
-    if (file) {
-      const reader = new FileReader()
-      reader.onloadend = () => {
-        setAvatarPreview(reader.result as string)
-      }
-      reader.readAsDataURL(file)
-    }
-  }
-
-  const removeAvatar = () => {
-    setAvatarPreview(null)
   }
 
   return (
@@ -72,42 +57,6 @@ export function LoginForm() {
           <div className="w-full max-w-md space-y-8">
             <div className="text-left">
               <h1 className="text-3xl font-bold text-black mb-2">Login</h1>
-            </div>
-
-            {/* Profile Picture Upload */}
-            <div className="flex items-center space-x-4">
-              <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center overflow-hidden">
-                {avatarPreview ? (
-                  <img
-                    src={avatarPreview}
-                    alt="Avatar preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <User className="w-8 h-8 text-gray-400" />
-                )}
-              </div>
-              <div className="flex space-x-4 text-sm">
-                <label className="text-gray-600 hover:text-gray-900 cursor-pointer">
-                  Upload new
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="hidden"
-                    onChange={e => {
-                      const file = e.target.files?.[0] || null
-                      handleAvatarChange(file)
-                    }}
-                  />
-                </label>
-                <button
-                  type="button"
-                  onClick={removeAvatar}
-                  className="text-gray-600 hover:text-gray-900"
-                >
-                  Remove
-                </button>
-              </div>
             </div>
 
             <Form {...form}>

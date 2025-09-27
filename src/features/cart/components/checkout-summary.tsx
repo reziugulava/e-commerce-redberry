@@ -40,7 +40,7 @@ export function CheckoutSummary({
       >
         <div className="space-y-4 py-4">
           {cart.map(item => (
-            <div key={item.id} className="flex gap-4">
+            <div key={item.cartItemKey || item.id} className="flex gap-4">
               {/* Product Image */}
               <div className="flex-shrink-0">
                 {item.cover_image ? (
@@ -84,7 +84,7 @@ export function CheckoutSummary({
                       className="h-6 w-6 rounded-full hover:bg-gray-100"
                       onClick={() =>
                         updateCartItem({
-                          productId: item.id,
+                          cartItemKey: item.cartItemKey || item.id.toString(),
                           quantity: item.quantity - 1,
                         })
                       }
@@ -101,7 +101,7 @@ export function CheckoutSummary({
                       className="h-6 w-6 rounded-full hover:bg-gray-100"
                       onClick={() =>
                         updateCartItem({
-                          productId: item.id,
+                          cartItemKey: item.cartItemKey || item.id.toString(),
                           quantity: item.quantity + 1,
                         })
                       }
@@ -115,7 +115,7 @@ export function CheckoutSummary({
                       variant="ghost"
                       size="sm"
                       className="h-7 text-xs"
-                      onClick={() => removeFromCart(item.id)}
+                      onClick={() => removeFromCart(item.cartItemKey || item.id.toString())}
                     >
                       Remove
                     </Button>

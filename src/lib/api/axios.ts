@@ -6,16 +6,21 @@ export const api = axios.create({
   baseURL: API_URL,
   headers: {
     Accept: 'application/json',
-    'Content-Type': 'application/json',
   },
 })
 
-// Add response interceptor to handle auth token
+// Add request interceptor to handle auth token and content type
 api.interceptors.request.use(config => {
   const token = localStorage.getItem('auth_token')
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
+  
+  // Only set JSON content-type if data is not FormData
+  if (!(config.data instanceof FormData)) {
+    config.headers['Content-Type'] = 'application/json'
+  }
+  
   return config
 })
 

@@ -22,18 +22,18 @@ export default function CartPage() {
   const total = subtotal + shipping
 
   const handleQuantityChange = (
-    productId: number,
+    cartItemKey: string,
     currentQuantity: number,
     change: number
   ) => {
     const newQuantity = currentQuantity + change
     if (newQuantity > 0) {
-      updateCartItem({ productId, quantity: newQuantity })
+      updateCartItem({ cartItemKey, quantity: newQuantity })
     }
   }
 
-  const handleRemoveItem = (productId: number) => {
-    removeFromCart(productId)
+  const handleRemoveItem = (cartItemKey: string) => {
+    removeFromCart(cartItemKey)
   }
 
   const handleProceedToCheckout = () => {
@@ -69,7 +69,7 @@ export default function CartPage() {
               <div className="space-y-4">
                 {cart.map(item => (
                   <div
-                    key={item.id}
+                    key={item.cartItemKey || item.id}
                     className="flex items-center space-x-4 py-4 border-b border-gray-200 last:border-b-0"
                   >
                     <div className="flex-1">
@@ -77,6 +77,13 @@ export default function CartPage() {
                       <p className="text-gray-600">
                         {item.brand?.name || 'Unknown Brand'}
                       </p>
+                      {/* Display variant info if available */}
+                      {(item.selected_color || item.selected_size) && (
+                        <div className="flex gap-2 text-sm text-gray-500 mt-1">
+                          {item.selected_color && <span>Color: {item.selected_color}</span>}
+                          {item.selected_size && <span>Size: {item.selected_size}</span>}
+                        </div>
+                      )}
                       <p className="text-lg font-semibold text-green-600 mt-1">
                         ${item.price.toFixed(2)}
                       </p>
@@ -88,7 +95,7 @@ export default function CartPage() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          handleQuantityChange(item.id, item.quantity, -1)
+                          handleQuantityChange(item.cartItemKey || item.id.toString(), item.quantity, -1)
                         }
                         disabled={isUpdatingCart}
                         className="h-8 w-8 p-0"
@@ -102,7 +109,7 @@ export default function CartPage() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          handleQuantityChange(item.id, item.quantity, 1)
+                          handleQuantityChange(item.cartItemKey || item.id.toString(), item.quantity, 1)
                         }
                         disabled={isUpdatingCart}
                         className="h-8 w-8 p-0"
@@ -122,7 +129,7 @@ export default function CartPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveItem(item.id)}
+                      onClick={() => handleRemoveItem(item.cartItemKey || item.id.toString())}
                       disabled={isRemovingFromCart}
                       className="text-red-500 hover:text-red-700"
                     >

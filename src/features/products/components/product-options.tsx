@@ -53,11 +53,32 @@ export function ProductOptions({
     }
   }
 
+  // Check if product is out of stock (no available colors or sizes)
+  const isOutOfStock = !availableColors?.length || !availableSizes?.length
+
+  // If out of stock, show a different UI
+  if (isOutOfStock) {
+    return (
+      <div className="space-y-6">
+        <div className="rounded-lg border border-red-200 bg-red-50 p-6 text-center">
+          <div className="text-lg font-semibold text-red-800 mb-2">
+            Out of Stock
+          </div>
+          <div className="text-sm text-red-600">
+            This product is currently unavailable
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="space-y-6">
       {/* Color Selection */}
       <div className="space-y-4">
-        <Label>Color</Label>
+        <Label>
+          Color{selectedColor ? `: ${selectedColor}` : ''}
+        </Label>
         <RadioGroup
           onValueChange={handleColorChange}
           value={selectedColor}
@@ -100,7 +121,7 @@ export function ProductOptions({
               />
               <Label
                 htmlFor={`size-${index}`}
-                className="flex h-10 w-10 cursor-pointer items-center justify-center rounded-md border text-sm font-medium peer-aria-checked:border-primary peer-aria-checked:bg-primary/5"
+                className="flex h-10 w-16 cursor-pointer items-center justify-center rounded-md border text-sm font-medium peer-aria-checked:border-primary peer-aria-checked:bg-primary/5"
               >
                 {size}
               </Label>
@@ -116,7 +137,7 @@ export function ProductOptions({
           value={quantity.toString()}
           onValueChange={value => setQuantity(Number(value))}
         >
-          <SelectTrigger className="w-24">
+          <SelectTrigger className="w-14">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>

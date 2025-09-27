@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button'
 import { User, RefreshCw } from 'lucide-react'
 import { useLogout, useCurrentUser } from '../hooks/use-auth'
 import { useUserStore } from '../stores/user'
+import { ProfileSettings } from './profile-settings'
 
 export function UserNav() {
   const user = useUserStore(state => state.user)
@@ -25,6 +26,8 @@ export function UserNav() {
   // Debug log to check if profile_photo is available
   console.log('User in UserNav:', user)
 
+  const displayName = user.name || user.username || 'User'
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -33,8 +36,13 @@ export function UserNav() {
             {user.profile_photo ? (
               <img
                 src={user.profile_photo}
-                alt={user.username}
+                alt={displayName}
                 className="w-full h-full object-cover"
+                onError={(e) => {
+                  console.error('Avatar failed to load:', user.profile_photo)
+                  // Hide the broken image and show default icon
+                  e.currentTarget.style.display = 'none'
+                }}
               />
             ) : (
               <User className="h-4 w-4 text-gray-600" />
@@ -50,8 +58,13 @@ export function UserNav() {
                 {user.profile_photo ? (
                   <img
                     src={user.profile_photo}
-                    alt={user.username}
+                    alt={displayName}
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      console.error('Avatar failed to load in dropdown:', user.profile_photo)
+                      // Hide the broken image and show default icon
+                      e.currentTarget.style.display = 'none'
+                    }}
                   />
                 ) : (
                   <User className="h-3 w-3 text-gray-600" />
@@ -59,7 +72,7 @@ export function UserNav() {
               </div>
               <div>
                 <p className="text-sm font-medium leading-none">
-                  {user.username}
+                  {displayName}
                 </p>
                 <p className="text-xs leading-none text-muted-foreground">
                   {user.email}
@@ -76,7 +89,7 @@ export function UserNav() {
         {user.is_admin === 1 && (
           <DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
         )}
-        <DropdownMenuItem>Settings</DropdownMenuItem>
+        <ProfileSettings />
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>

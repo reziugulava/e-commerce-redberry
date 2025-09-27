@@ -5,8 +5,8 @@ import {
   addToCart,
   checkout,
   getCart,
-  removeFromCart,
-  updateCartItem,
+  removeCartItemVariant,
+  updateCartItemVariant,
 } from '../api/cart'
 import type { AddToCartPayload, CartItem } from '../api/cart'
 import { useUserStore } from '@/features/auth/stores/user'
@@ -41,7 +41,6 @@ export function useCart() {
     mutationFn: ({
       productId,
       payload,
-      productData,
     }: {
       productId: number
       payload: AddToCartPayload
@@ -55,48 +54,40 @@ export function useCart() {
         throw new Error('Authentication required')
       }
 
-      // Store product selection data in localStorage
+      return addToCart(productId, payload)
+    },
+    onMutate: async () => {
+      // Cancel outgoing refetches
+      await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
+
+      // Get current cart for rollback purposes
+      const previousCart =
+        queryClient.getQueryData<CartItem[]>(CART_QUERY_KEY) ?? []
+
+      // We'll let the onSuccess callback handle localStorage updates
+      // and onSettled will trigger a fresh fetch
+      
+      return { previousCart }
+    },
+    onSuccess: (_data, { productId, payload, productData }) => {
+      const callId = Math.random().toString(36).substr(2, 9)
+      console.log(`🚀 addToCartMutation onSuccess called [${callId}]:`, {
+        productId,
+        payload,
+        productData
+      })
+      
+      // Store product selection data in localStorage only after successful API call
       if (productData) {
+        console.log(`📝 Calling setCartSelection [${callId}]`)
         setCartSelection({
           productId,
           selected_color: productData.selected_color,
           selected_size: productData.selected_size,
           cover_image: productData.cover_image,
+          quantity: payload.quantity,
         })
       }
-
-      return addToCart(productId, payload)
-    },
-    onMutate: async ({ productId, payload }) => {
-      // Cancel outgoing refetches
-      await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
-
-      // Get current cart
-      const previousCart =
-        queryClient.getQueryData<CartItem[]>(CART_QUERY_KEY) ?? []
-
-      // Create optimistic cart item
-      const newItem = {
-        id: productId,
-        quantity: payload.quantity,
-        // If the item already exists in cart, use its data
-        ...previousCart.find(item => item.id === productId),
-      }
-
-      // Update cart optimistically
-      const newCart = [...previousCart]
-      const existingItemIndex = newCart.findIndex(item => item.id === productId)
-
-      if (existingItemIndex > -1) {
-        newCart[existingItemIndex].quantity += payload.quantity
-      } else if ('name' in newItem) {
-        // Only add if we have full item data
-        newCart.push(newItem as CartItem)
-      }
-
-      queryClient.setQueryData(CART_QUERY_KEY, newCart)
-
-      return { previousCart }
     },
     onError: (error: any, _variables, context) => {
       // If 401 unauthorized, redirect to login
@@ -115,19 +106,21 @@ export function useCart() {
   // Update cart item mutation
   const updateCartMutation = useMutation({
     mutationFn: ({
-      productId,
+      cartItemKey,
       quantity,
     }: {
-      productId: number
+      cartItemKey: string
       quantity: number
-    }) => updateCartItem(productId, quantity),
-    onMutate: async ({ productId, quantity }) => {
+    }) => {
+      return updateCartItemVariant(cartItemKey, quantity)
+    },
+    onMutate: async ({ cartItemKey, quantity }) => {
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
       const previousCart =
         queryClient.getQueryData<CartItem[]>(CART_QUERY_KEY) ?? []
 
       const newCart = previousCart.map(item =>
-        item.id === productId ? { ...item, quantity } : item
+        item.cartItemKey === cartItemKey ? { ...item, quantity } : item
       )
 
       queryClient.setQueryData(CART_QUERY_KEY, newCart)
@@ -146,13 +139,15 @@ export function useCart() {
 
   // Remove from cart mutation
   const removeFromCartMutation = useMutation({
-    mutationFn: (productId: number) => removeFromCart(productId),
-    onMutate: async productId => {
+    mutationFn: (cartItemKey: string) => {
+      return removeCartItemVariant(cartItemKey)
+    },
+    onMutate: async cartItemKey => {
       await queryClient.cancelQueries({ queryKey: CART_QUERY_KEY })
       const previousCart =
         queryClient.getQueryData<CartItem[]>(CART_QUERY_KEY) ?? []
 
-      const newCart = previousCart.filter(item => item.id !== productId)
+      const newCart = previousCart.filter(item => item.cartItemKey !== cartItemKey)
       queryClient.setQueryData(CART_QUERY_KEY, newCart)
 
       return { previousCart }

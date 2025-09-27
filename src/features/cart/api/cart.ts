@@ -2,10 +2,13 @@ import { api } from '@/lib/api/axios'
 import type { Product } from '@/features/products/types/product'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 import {
-  getCartSelection,
+  getCartSelections,
   cleanupCartSelections,
   removeCartSelection,
   clearCartSelections,
+  generateCartItemKey,
+  updateCartItemQuantity,
+  type CartItemSelection,
 } from '../utils/cart-storage'
 
 interface AxiosErrorResponse {
@@ -28,6 +31,8 @@ export interface CartItem extends Pick<Product, 'id' | 'name' | 'price'> {
     id: number
     name: string
   }
+  // Unique key for React rendering and cart management
+  cartItemKey?: string
 }
 
 export interface AddToCartPayload {
@@ -63,6 +68,38 @@ export const updateCartItem = async (
 }
 
 /**
+ * Update the quantity of a specific cart item variant
+ */
+export const updateCartItemVariant = async (
+  cartItemKey: string,
+  quantity: number
+): Promise<void> => {
+  // Parse the cart item key to get product details
+  const parts = cartItemKey.split('-')
+  const productId = parseInt(parts[0], 10)
+  const color = parts[1] === 'no-color' ? undefined : parts[1]
+  const size = parts[2] === 'no-size' ? undefined : parts[2]
+
+  // Update the specific variant quantity in localStorage
+  updateCartItemQuantity(productId, quantity, color, size)
+
+  // Calculate total quantity for all variants of this product
+  const allSelections = getCartSelections()
+  const totalQuantity = allSelections
+    .filter(selection => selection.productId === productId)
+    .reduce((sum, selection) => sum + selection.quantity, 0)
+
+  // Update backend with total quantity
+  if (totalQuantity > 0) {
+    await api.patch(`/cart/products/${productId}`, { quantity: totalQuantity })
+  } else {
+    // If total quantity is 0, remove the product entirely
+    await api.delete(`/cart/products/${productId}`)
+    removeCartSelection(productId)
+  }
+}
+
+/**
  * Remove a product from the cart
  * @returns void
  * @throws 401 Unauthorized - User is not authenticated
@@ -74,21 +111,113 @@ export const removeFromCart = async (productId: number): Promise<void> => {
 }
 
 /**
+ * Remove a specific cart item variant
+ * For the API call, we still use the product ID, but we also clean up
+ * the specific variant from localStorage
+ */
+export const removeCartItemVariant = async (
+  cartItemKey: string
+): Promise<void> => {
+  // Parse the cart item key to get product details
+  const parts = cartItemKey.split('-')
+  const productId = parseInt(parts[0], 10)
+  const color = parts[1] === 'no-color' ? undefined : parts[1]
+  const size = parts[2] === 'no-size' ? undefined : parts[2]
+
+  // Remove the specific variant from localStorage first
+  const allSelections = getCartSelections()
+  const remainingSelections = allSelections.filter(
+    selection =>
+      !(
+        selection.productId === productId &&
+        selection.selected_color === color &&
+        selection.selected_size === size
+      )
+  )
+
+  // Check if there are any remaining variants for this product
+  const hasRemainingVariants = remainingSelections.some(
+    selection => selection.productId === productId
+  )
+
+  if (!hasRemainingVariants) {
+    // No more variants, remove the entire product from backend
+    await api.delete(`/cart/products/${productId}`)
+    // Remove all selections for this product
+    removeCartSelection(productId)
+  } else {
+    // Calculate new total quantity for backend
+    const totalQuantity = remainingSelections
+      .filter(selection => selection.productId === productId)
+      .reduce((sum, selection) => sum + selection.quantity, 0)
+
+    // Update backend with new total quantity
+    await api.patch(`/cart/products/${productId}`, { quantity: totalQuantity })
+    
+    // Update localStorage by removing the specific variant
+    localStorage.setItem('cart_selections', JSON.stringify(remainingSelections))
+  }
+}
+
+/**
  * Get all items in the cart
  * @returns Array of cart items
  * @throws 401 Unauthorized - User is not authenticated
  */
 export const getCart = async (): Promise<CartItem[]> => {
+  const callId = Math.random().toString(36).substr(2, 9)
   const { data } = await api.get('/cart')
 
-  // Merge API data with localStorage selections
-  const enrichedCart = data.map((item: CartItem) => {
-    const selection = getCartSelection(item.id)
-    return {
-      ...item,
-      cover_image: selection?.cover_image || item.cover_image,
-      selected_color: selection?.selected_color,
-      selected_size: selection?.selected_size,
+  console.log(`🔍 getCart API response [${callId}]:`, data)
+
+  // Since the backend only stores one item per product ID, we need to simulate
+  // multiple variants by matching them with localStorage selections
+  const allSelections = getCartSelections()
+  console.log(`🔍 localStorage selections [${callId}]:`, allSelections)
+  
+  const cartItems: CartItem[] = []
+
+  // Group selections by product ID
+  const selectionsByProduct = allSelections.reduce((acc: Record<number, CartItemSelection[]>, selection: CartItemSelection) => {
+    if (!acc[selection.productId]) {
+      acc[selection.productId] = []
+    }
+    acc[selection.productId].push(selection)
+    return acc
+  }, {} as Record<number, CartItemSelection[]>)
+
+  console.log(`🔍 selectionsByProduct [${callId}]:`, selectionsByProduct)
+
+  // For each item from the API, create cart items for each variant stored in localStorage
+  data.forEach((apiItem: CartItem) => {
+    const selections = selectionsByProduct[apiItem.id] || []
+    console.log(`🔍 Processing API item ${apiItem.id}, found ${selections.length} variants [${callId}]`)
+    
+    if (selections.length === 0) {
+      // No specific selections, create a default item
+      cartItems.push({
+        ...apiItem,
+        cartItemKey: generateCartItemKey(apiItem.id),
+      })
+    } else {
+      // Create an item for each variant using the quantity from localStorage
+      selections.forEach((selection: CartItemSelection) => {
+        const cartItem = {
+          ...apiItem,
+          cover_image: selection.cover_image || apiItem.cover_image,
+          selected_color: selection.selected_color,
+          selected_size: selection.selected_size,
+          cartItemKey: generateCartItemKey(
+            apiItem.id,
+            selection.selected_color,
+            selection.selected_size
+          ),
+          // Use the quantity stored in localStorage for this specific variant
+          quantity: selection.quantity,
+        }
+        console.log(`🔍 Created cart item [${callId}]:`, cartItem)
+        cartItems.push(cartItem)
+      })
     }
   })
 
@@ -96,7 +225,19 @@ export const getCart = async (): Promise<CartItem[]> => {
   const activeProductIds = data.map((item: CartItem) => item.id)
   cleanupCartSelections(activeProductIds)
 
-  return enrichedCart
+  // Deduplicate cart items by cartItemKey (this shouldn't be necessary, but ensures no duplicates)
+  const uniqueCartItems = cartItems.reduce((acc: CartItem[], item) => {
+    const existingIndex = acc.findIndex(existing => existing.cartItemKey === item.cartItemKey)
+    if (existingIndex === -1) {
+      acc.push(item)
+    } else {
+      console.warn(`🚫 Duplicate cart item detected and removed [${callId}]:`, item.cartItemKey)
+    }
+    return acc
+  }, [])
+
+  console.log(`🔍 Final cart items [${callId}]:`, uniqueCartItems)
+  return uniqueCartItems
 }
 
 /**
