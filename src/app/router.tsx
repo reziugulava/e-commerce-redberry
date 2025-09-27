@@ -8,7 +8,6 @@ const RegisterPage = lazy(() => import('./routes/auth/register'))
 const ProductsPage = lazy(() => import('./routes/products/page'))
 const ProductDetailPage = lazy(() => import('./routes/products/[id]'))
 const CheckoutPage = lazy(() => import('./routes/checkout/page'))
-const CheckoutSuccessPage = lazy(() => import('./routes/checkout/success'))
 const NotFoundPage = lazy(() => import('./routes/not-found'))
 
 // Loading component
@@ -69,14 +68,6 @@ export const router = createBrowserRouter([
         element: (
           <Suspense fallback={<PageLoader />}>
             <CheckoutPage />
-          </Suspense>
-        ),
-      },
-      {
-        path: 'checkout/success',
-        element: (
-          <Suspense fallback={<PageLoader />}>
-            <CheckoutSuccessPage />
           </Suspense>
         ),
       },

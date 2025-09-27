@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button'
 import { useCart } from '@/features/cart/hooks/use-cart'
 import { CheckoutSummary } from '@/features/cart/components/checkout-summary'
 import { CheckoutForm } from '@/features/checkout/components/checkout-form'
+import { CheckoutSuccessModal } from '@/components/checkout-success-modal'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 import { useUserStore } from '@/features/auth/stores/user'
 import { ShoppingCart, AlertCircle, X } from 'lucide-react'
@@ -15,6 +16,12 @@ export default function CheckoutPage() {
   const { user, token } = useUserStore()
 
   const [localError, setLocalError] = useState<string | null>(null)
+  const [showSuccessModal, setShowSuccessModal] = useState(false)
+  const [orderData, setOrderData] = useState<{
+    orderTotal: number
+    checkoutData: CheckoutFormData
+  } | null>(null)
+  const [isCheckoutCompleted, setIsCheckoutCompleted] = useState(false)
 
   const calculateTotal = useCallback(() => {
     const subtotal = cart.reduce(
@@ -52,14 +59,13 @@ export default function CheckoutPage() {
     try {
       await checkout(formData)
 
-      // Navigate to success page with order data
-      navigate('/checkout/success', {
-        state: {
-          orderTotal: total,
-          checkoutData: formData,
-        },
-        replace: true, // Replace current history entry
+      // Mark checkout as completed and set up success modal
+      setIsCheckoutCompleted(true)
+      setOrderData({
+        orderTotal: total,
+        checkoutData: formData,
       })
+      setShowSuccessModal(true)
     } catch (error: unknown) {
       console.error('Checkout failed:', error)
       const errorMessage =
@@ -88,11 +94,19 @@ export default function CheckoutPage() {
     setLocalError(null)
   }
 
+  const handleCloseSuccessModal = () => {
+    setShowSuccessModal(false)
+    setOrderData(null)
+    setIsCheckoutCompleted(false)
+    // Navigate to products page
+    navigate('/products')
+  }
+
   // Display error from either source
   const displayError =
     localError || (checkoutError ? String(checkoutError) : null)
 
-  if (cart.length === 0) {
+  if (cart.length === 0 && !isCheckoutCompleted) {
     return (
       <div className="container mx-auto px-4 py-8">
         <div className="max-w-2xl mx-auto text-center">
@@ -163,6 +177,13 @@ export default function CheckoutPage() {
           </div>
         </div>
       </div>
+
+      {/* Success Modal */}
+      <CheckoutSuccessModal
+        isOpen={showSuccessModal}
+        onClose={handleCloseSuccessModal}
+        orderData={orderData || undefined}
+      />
     </div>
   )
 }

@@ -15,6 +15,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Filter } from 'lucide-react'
+import { useState, useEffect } from 'react'
 
 interface ProductFiltersProps {
   filters: Filters
@@ -29,15 +30,27 @@ export const ProductFilters = ({
   onFilterChange,
   onSortChange,
 }: ProductFiltersProps) => {
+  // Local state for pending filter changes
+  const [pendingFilters, setPendingFilters] = useState<Filters>(filters)
+
+  // Update pending filters when props change
+  useEffect(() => {
+    setPendingFilters(filters)
+  }, [filters])
+
   const handlePriceChange = (
     type: 'price_from' | 'price_to',
     value: string
   ) => {
     const numValue = value === '' ? undefined : Number(value)
-    onFilterChange({
-      ...filters,
+    setPendingFilters({
+      ...pendingFilters,
       [type]: numValue,
     })
+  }
+
+  const applyFilters = () => {
+    onFilterChange(pendingFilters)
   }
 
   return (
@@ -71,7 +84,7 @@ export const ProductFilters = ({
                     id="price-from"
                     type="number"
                     min={0}
-                    value={filters.price_from ?? ''}
+                    value={pendingFilters.price_from ?? ''}
                     onChange={e =>
                       handlePriceChange('price_from', e.target.value)
                     }
@@ -90,7 +103,7 @@ export const ProductFilters = ({
                     id="price-to"
                     type="number"
                     min={0}
-                    value={filters.price_to ?? ''}
+                    value={pendingFilters.price_to ?? ''}
                     onChange={e =>
                       handlePriceChange('price_to', e.target.value)
                     }
@@ -98,6 +111,16 @@ export const ProductFilters = ({
                     className="mt-1"
                   />
                 </div>
+              </div>
+              
+              {/* Apply Button */}
+              <div className="pt-2">
+                <Button
+                  onClick={applyFilters}
+                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium"
+                >
+                  Apply
+                </Button>
               </div>
             </div>
           </DropdownMenuContent>

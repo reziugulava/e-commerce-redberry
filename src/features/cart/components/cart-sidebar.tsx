@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   Sheet,
@@ -17,6 +18,7 @@ interface CartSidebarProps {
 
 export function CartSidebar({ children }: CartSidebarProps) {
   const navigate = useNavigate()
+  const [isOpen, setIsOpen] = useState(false)
   const { cart, isLoading, updateCartItem, removeFromCart } = useCart()
 
   const DELIVERY_FEE = 5
@@ -26,11 +28,12 @@ export function CartSidebar({ children }: CartSidebarProps) {
   const total = subtotal + (subtotal > 0 ? DELIVERY_FEE : 0) // Only add delivery fee if cart is not empty
 
   const handleCheckout = () => {
+    setIsOpen(false) // Close the sidebar
     navigate('/checkout')
   }
 
   return (
-    <Sheet>
+    <Sheet open={isOpen} onOpenChange={setIsOpen}>
       <SheetTrigger asChild>{children}</SheetTrigger>
       <SheetContent className="flex flex-col w-full sm:max-w-lg">
         <SheetHeader>
