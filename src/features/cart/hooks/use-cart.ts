@@ -54,7 +54,7 @@ export function useCart() {
       if (!checkAuthAndRedirect()) {
         throw new Error('Authentication required')
       }
-      
+
       // Store product selection data in localStorage
       if (productData) {
         setCartSelection({
@@ -64,7 +64,7 @@ export function useCart() {
           cover_image: productData.cover_image,
         })
       }
-      
+
       return addToCart(productId, payload)
     },
     onMutate: async ({ productId, payload }) => {

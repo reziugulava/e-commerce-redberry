@@ -7,7 +7,6 @@ import {
   SheetTrigger,
 } from '@/components/ui/sheet'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { Separator } from '@/components/ui/separator'
 import { Button } from '@/components/ui/button'
 import { useCart } from '../hooks/use-cart'
 import { formatPrice } from '@/lib/utils'
@@ -62,11 +61,13 @@ export function CartSidebar({ children }: CartSidebarProps) {
                         />
                       ) : (
                         <div className="w-16 h-26 bg-gray-200 rounded-md border flex items-center justify-center">
-                          <span className="text-xs text-gray-500">No Image</span>
+                          <span className="text-xs text-gray-500">
+                            No Image
+                          </span>
                         </div>
                       )}
                     </div>
-                    
+
                     {/* Product Details */}
                     <div className="flex-1 min-w-0">
                       <div className="space-y-2">
@@ -78,29 +79,25 @@ export function CartSidebar({ children }: CartSidebarProps) {
                             {formatPrice(item.price)}
                           </p>
                         </div>
-                        
+
                         {/* Size and Color */}
                         <div className="flex flex-col gap-1 text-xs text-muted-foreground">
                           {item.selected_size && (
-                            <span>
-                              {item.selected_size}
-                            </span>
+                            <span>{item.selected_size}</span>
                           )}
                           {item.selected_color && (
-                            <span>
-                              {item.selected_color}
-                            </span>
+                            <span>{item.selected_color}</span>
                           )}
                         </div>
                       </div>
-                      
+
                       {/* Quantity and Remove Controls */}
                       <div className="flex items-center justify-between mt-3">
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center bg-white border border-gray-300 rounded-full px-1 py-1">
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className="h-6 w-6 rounded-full hover:bg-gray-100"
                             onClick={() =>
                               updateCartItem({
                                 productId: item.id,
@@ -111,11 +108,13 @@ export function CartSidebar({ children }: CartSidebarProps) {
                           >
                             -
                           </Button>
-                          <span className="w-8 text-center text-sm">{item.quantity}</span>
+                          <span className="w-8 text-center text-sm font-medium">
+                            {item.quantity}
+                          </span>
                           <Button
-                            variant="outline"
+                            variant="ghost"
                             size="icon"
-                            className="h-7 w-7"
+                            className="h-6 w-6 rounded-full hover:bg-gray-100"
                             onClick={() =>
                               updateCartItem({
                                 productId: item.id,
@@ -126,7 +125,7 @@ export function CartSidebar({ children }: CartSidebarProps) {
                             +
                           </Button>
                         </div>
-                        
+
                         <div className="flex items-center justify-end">
                           <Button
                             variant="ghost"
@@ -145,25 +144,23 @@ export function CartSidebar({ children }: CartSidebarProps) {
             </ScrollArea>
 
             <div className="space-y-4 pt-4">
-              <Separator />
-              <div className="space-y-1.5">
-                <div className="flex justify-between text-sm">
+              <div className="space-y-3">
+                <div className="flex justify-between text-sm py-0.75">
                   <span>items Subtotal</span>
                   <span>{formatPrice(subtotal)}</span>
                 </div>
                 {subtotal > 0 && (
-                  <div className="flex justify-between text-sm">
+                  <div className="flex justify-between text-sm py-0.75">
                     <span>Delivery</span>
                     <span>{formatPrice(DELIVERY_FEE)}</span>
                   </div>
                 )}
-                <Separator className="my-2" />
-                <div className="flex justify-between font-medium">
+                <div className="flex justify-between text-lg font-medium py-0.75">
                   <span>Total</span>
                   <span>{formatPrice(total)}</span>
                 </div>
               </div>
-              <div className="space-y-2">
+              <div className="space-y-2 pt-15">
                 <Button
                   className="w-full bg-orange-500 hover:bg-orange-600"
                   onClick={handleCheckout}

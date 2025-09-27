@@ -10,9 +10,7 @@ export function Header({ children }: HeaderProps) {
     <header className="fixed top-0 left-0 right-0 z-50 border-b bg-white">
       <div className="container mx-auto px-4 h-16 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2 text-xl font-bold">
-          <div className="w-8 h-8 bg-red-500 rounded flex items-center justify-center">
-            <span className="text-white font-bold text-sm">✋</span>
-          </div>
+          <img src="/Vector.png" alt="RedSeam Logo" className="w-5 h-6" />
           <span>RedSeam Clothing</span>
         </Link>
 

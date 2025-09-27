@@ -6,7 +6,7 @@ import { CheckoutSummary } from '@/features/cart/components/checkout-summary'
 import { CheckoutForm } from '@/features/checkout/components/checkout-form'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 import { useUserStore } from '@/features/auth/stores/user'
-import { ArrowLeft, ShoppingCart, AlertCircle, X } from 'lucide-react'
+import { ShoppingCart, AlertCircle, X } from 'lucide-react'
 import { toast } from 'sonner'
 
 export default function CheckoutPage() {
@@ -94,10 +94,6 @@ export default function CheckoutPage() {
     onCheckout(formData)
   }
 
-  const handleBackToCart = () => {
-    navigate('/products')
-  }
-
   const handleDismissError = () => {
     setLocalError(null)
   }
@@ -124,20 +120,11 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-4xl mx-auto">
+    <div className="container ml-0 px-2 py-8">
+      <div className="max-w-8xl">
         {/* Header */}
-        <div className="flex items-center mb-8">
-          <Button variant="ghost" onClick={handleBackToCart} className="mr-4">
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Back to Products
-          </Button>
-          <div>
-            <h1 className="text-3xl font-bold">Checkout</h1>
-            <p className="text-gray-600">
-              Review your order and complete your purchase
-            </p>
-          </div>
+        <div className="mb-8">
+          <h1 className="text-4xl font-bold">Checkout</h1>
         </div>
 
         {/* Error Message */}
@@ -159,65 +146,29 @@ export default function CheckoutPage() {
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Order Items */}
-          <div className="lg:col-span-2 space-y-6">
-            <div className="bg-white rounded-lg border p-6">
-              <h2 className="text-xl font-semibold mb-4">Order Items</h2>
-              <div className="space-y-4">
-                {cart.map(item => (
-                  <div
-                    key={item.id}
-                    className="flex items-center space-x-4 py-4 border-b border-gray-200 last:border-b-0"
-                  >
-                    <div className="flex-1">
-                      <h3 className="font-medium">{item.name}</h3>
-                      <p className="text-sm text-gray-500">
-                        {item.brand?.name || 'Unknown Brand'}
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Quantity: {item.quantity}
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-medium">
-                        ${item.price.toFixed(2)} each
-                      </p>
-                      <p className="text-sm text-gray-500">
-                        Total: ${(item.price * item.quantity).toFixed(2)}
-                      </p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Checkout Form */}
+          {/* Billing Information */}
+          <div className="lg:col-span-2 space-y-6 -ml-8">
+            {/* Checkout Form with Billing Information */}
             <CheckoutForm
               onSubmit={handleCheckoutFormSubmit}
               isLoading={isCheckingOut}
             />
-
-            {/* Shipping Information */}
-            <div className="bg-white rounded-lg border p-6">
-              <h2 className="text-xl font-semibold mb-4">
-                Shipping Information
-              </h2>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-blue-800 font-medium">
-                  Standard Shipping - $5.00
-                </p>
-                <p className="text-blue-700 text-sm">
-                  Delivery in 3-5 business days
-                </p>
-              </div>
-            </div>
           </div>
 
           {/* Order Summary */}
           <div className="lg:col-span-1">
             <CheckoutSummary
+              onCheckout={() => {
+                // Get form data from the form element
+                const formElement = document.querySelector(
+                  'form'
+                ) as HTMLFormElement
+                if (formElement) {
+                  formElement.requestSubmit()
+                }
+              }}
               isCheckingOut={isCheckingOut}
-              hideCheckoutButton={true}
+              hideCheckoutButton={false}
             />
           </div>
         </div>

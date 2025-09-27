@@ -4,7 +4,6 @@ import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { Eye, EyeOff, User } from 'lucide-react'
-import authBackground from '@/assets/auth-background.png'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -87,19 +86,18 @@ export function RegisterForm() {
   }
 
   return (
-    <div className="min-h-screen flex">
+    <div className="fixed inset-0 flex">
       {/* Left Column - Image */}
-      <div className="hidden lg:flex lg:w-[55%] relative">
+      <div className="hidden lg:flex lg:w-[50%] relative">
         <img
-          src={authBackground}
-          alt="Fashion & Lifestyle"
-          className="w-full h-full object-cover"
+          src="/rectangle-10.png"
+          alt="Rectangle 10"
+          className="w-full h-full object-fill"
         />
-        <div className="absolute inset-0 bg-black bg-opacity-20" />
       </div>
 
       {/* Right Column - Form */}
-      <div className="flex-1 lg:w-[45%] flex flex-col">
+      <div className="flex-1 lg:w-[50%] flex flex-col pt-16">
         {/* Form Content */}
         <div className="flex-1 flex items-center justify-center p-8">
           <div className="w-full max-w-md space-y-8">

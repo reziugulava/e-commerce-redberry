@@ -3,24 +3,22 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
-import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import type { CheckoutFormData } from '../types/checkout'
 
 const checkoutFormSchema = z.object({
   firstName: z.string().min(2, {
-    message: 'First name must be at least 2 characters.',
+    message: 'Name must be at least 2 characters.',
   }),
   lastName: z.string().min(2, {
-    message: 'Last name must be at least 2 characters.',
+    message: 'Surname must be at least 2 characters.',
   }),
   email: z.string().email({
     message: 'Please enter a valid email address.',
@@ -63,23 +61,26 @@ export function CheckoutForm({
   }
 
   return (
-    <div className="bg-white rounded-lg border p-6">
-      <h2 className="text-xl font-semibold mb-6">Billing Information</h2>
+    <div
+      className="rounded-xl p-16 w-[900px] h-[600px]"
+      style={{ backgroundColor: '#F8F6F7' }}
+    >
+      <h2 className="text-2xl font-semibold mb-8">order details</h2>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="flex flex-col md:flex-row md:space-x-5">
             <FormField
               control={form.control}
               name="firstName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>First Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your first name"
+                      placeholder="name"
                       {...field}
                       disabled={isLoading}
+                      className="bg-white w-62"
                     />
                   </FormControl>
                   <FormMessage />
@@ -92,12 +93,12 @@ export function CheckoutForm({
               name="lastName"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Last Name</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Enter your last name"
+                      placeholder="surname"
                       {...field}
                       disabled={isLoading}
+                      className="bg-white w-62"
                     />
                   </FormControl>
                   <FormMessage />
@@ -111,13 +112,13 @@ export function CheckoutForm({
             name="email"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Email Address</FormLabel>
                 <FormControl>
                   <Input
                     type="email"
-                    placeholder="Enter your email address"
+                    placeholder="email address"
                     {...field}
                     disabled={isLoading}
+                    className="bg-white w-129"
                   />
                 </FormControl>
                 <FormMessage />
@@ -125,45 +126,43 @@ export function CheckoutForm({
             )}
           />
 
-          <FormField
-            control={form.control}
-            name="address"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Street Address</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your full address"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
+          <div className="flex flex-col md:flex-row md:space-x-5">
+            <FormField
+              control={form.control}
+              name="address"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      placeholder="address"
+                      {...field}
+                      disabled={isLoading}
+                      className="bg-white w-62"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
-          <FormField
-            control={form.control}
-            name="zipCode"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>ZIP Code</FormLabel>
-                <FormControl>
-                  <Input
-                    placeholder="Enter your ZIP code"
-                    {...field}
-                    disabled={isLoading}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <Button type="submit" className="w-full" disabled={isLoading}>
-            {isLoading ? 'Processing...' : 'Complete Order'}
-          </Button>
+            <FormField
+              control={form.control}
+              name="zipCode"
+              render={({ field }) => (
+                <FormItem>
+                  <FormControl>
+                    <Input
+                      placeholder="ZIP code"
+                      {...field}
+                      disabled={isLoading}
+                      className="bg-white w-62"
+                    />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
         </form>
       </Form>
     </div>

@@ -29,7 +29,9 @@ export const getCartSelections = (): CartItemSelection[] => {
 /**
  * Get selection for a specific product
  */
-export const getCartSelection = (productId: number): CartItemSelection | undefined => {
+export const getCartSelection = (
+  productId: number
+): CartItemSelection | undefined => {
   const selections = getCartSelections()
   return selections.find(selection => selection.productId === productId)
 }
@@ -37,22 +39,26 @@ export const getCartSelection = (productId: number): CartItemSelection | undefin
 /**
  * Store or update selection for a product
  */
-export const setCartSelection = (selection: Omit<CartItemSelection, 'timestamp'>): void => {
+export const setCartSelection = (
+  selection: Omit<CartItemSelection, 'timestamp'>
+): void => {
   try {
     const selections = getCartSelections()
-    const existingIndex = selections.findIndex(s => s.productId === selection.productId)
-    
+    const existingIndex = selections.findIndex(
+      s => s.productId === selection.productId
+    )
+
     const newSelection: CartItemSelection = {
       ...selection,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     }
-    
+
     if (existingIndex >= 0) {
       selections[existingIndex] = newSelection
     } else {
       selections.push(newSelection)
     }
-    
+
     localStorage.setItem(CART_SELECTIONS_KEY, JSON.stringify(selections))
   } catch (error) {
     console.error('Error saving cart selection to localStorage:', error)
@@ -65,7 +71,9 @@ export const setCartSelection = (selection: Omit<CartItemSelection, 'timestamp'>
 export const removeCartSelection = (productId: number): void => {
   try {
     const selections = getCartSelections()
-    const filtered = selections.filter(selection => selection.productId !== productId)
+    const filtered = selections.filter(
+      selection => selection.productId !== productId
+    )
     localStorage.setItem(CART_SELECTIONS_KEY, JSON.stringify(filtered))
   } catch (error) {
     console.error('Error removing cart selection from localStorage:', error)
@@ -90,7 +98,7 @@ export const clearCartSelections = (): void => {
 export const cleanupCartSelections = (activeProductIds: number[]): void => {
   try {
     const selections = getCartSelections()
-    const filtered = selections.filter(selection => 
+    const filtered = selections.filter(selection =>
       activeProductIds.includes(selection.productId)
     )
     localStorage.setItem(CART_SELECTIONS_KEY, JSON.stringify(filtered))

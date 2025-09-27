@@ -76,14 +76,23 @@ export default function ProductDetailPage() {
     quantity: number
   }) => {
     try {
+      // Get the color-specific image
+      const colorIndex = product.available_colors.findIndex(
+        color => color.toLowerCase() === options.color.toLowerCase()
+      )
+      const colorSpecificImage =
+        colorIndex === 0
+          ? product.cover_image
+          : product.images[colorIndex] || product.cover_image
+
       addToCart({
         productId: product.id,
         payload: options,
         productData: {
-          cover_image: product.cover_image,
+          cover_image: colorSpecificImage,
           selected_color: options.color,
-          selected_size: options.size
-        }
+          selected_size: options.size,
+        },
       })
       // Stay on current page - user can access cart via sidebar
     } catch (error) {

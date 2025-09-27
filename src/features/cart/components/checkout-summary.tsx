@@ -1,7 +1,7 @@
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
+import { ScrollArea } from '@/components/ui/scroll-area'
 import { useCart } from '../hooks/use-cart'
-import type { CartItem } from '../api/cart'
+import { formatPrice } from '@/lib/utils'
 
 interface CheckoutSummaryProps {
   onCheckout?: () => void
@@ -14,16 +14,14 @@ export function CheckoutSummary({
   isCheckingOut = false,
   hideCheckoutButton = false,
 }: CheckoutSummaryProps) {
-  const { cart = [] } = useCart()
+  const { cart = [], updateCartItem, removeFromCart } = useCart()
 
+  const DELIVERY_FEE = 5
   const subtotal = cart.reduce(
-    (sum, item) => sum + item.price * item.quantity,
+    (total, item) => total + item.price * item.quantity,
     0
   )
-  const shipping = 5 // Fixed $5 shipping
-  const total = subtotal + shipping
-
-  const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0)
+  const total = subtotal + (subtotal > 0 ? DELIVERY_FEE : 0)
 
   if (cart.length === 0) {
     return (
@@ -34,55 +32,130 @@ export function CheckoutSummary({
   }
 
   return (
-    <div className="bg-white rounded-lg border p-6 space-y-4">
-      <h3 className="text-lg font-semibold">Order Summary</h3>
+    <div className="bg-white rounded-lg p-6 flex flex-col">
+      <div className="mb-4"></div>
 
-      <div className="space-y-3">
-        {cart.map((item: CartItem) => (
-          <div key={item.id} className="flex justify-between items-center">
-            <div className="flex-1">
-              <p className="font-medium">{item.name}</p>
-              <p className="text-sm text-gray-500">
-                {item.brand?.name || 'Unknown Brand'} × {item.quantity}
-              </p>
+      <ScrollArea
+        className={`-mx-6 px-6 ${cart.length > 3 ? 'h-80' : 'flex-1'}`}
+      >
+        <div className="space-y-4 py-4">
+          {cart.map(item => (
+            <div key={item.id} className="flex gap-4">
+              {/* Product Image */}
+              <div className="flex-shrink-0">
+                {item.cover_image ? (
+                  <img
+                    src={item.cover_image}
+                    alt={item.name}
+                    className="w-16 h-26 object-cover rounded-md border"
+                  />
+                ) : (
+                  <div className="w-16 h-26 bg-gray-200 rounded-md border flex items-center justify-center">
+                    <span className="text-xs text-gray-500">No Image</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Product Details */}
+              <div className="flex-1 min-w-0">
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <h4 className="font-medium leading-none text-sm truncate">
+                      {item.name}
+                    </h4>
+                    <p className="text-sm text-muted-foreground">
+                      {formatPrice(item.price)}
+                    </p>
+                  </div>
+
+                  {/* Size and Color */}
+                  <div className="flex flex-col gap-1 text-xs text-muted-foreground">
+                    {item.selected_size && <span>{item.selected_size}</span>}
+                    {item.selected_color && <span>{item.selected_color}</span>}
+                  </div>
+                </div>
+
+                {/* Quantity and Remove Controls */}
+                <div className="flex items-center justify-between mt-3">
+                  <div className="flex items-center bg-white border border-gray-300 rounded-full px-2 py-1">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-gray-100"
+                      onClick={() =>
+                        updateCartItem({
+                          productId: item.id,
+                          quantity: item.quantity - 1,
+                        })
+                      }
+                      disabled={item.quantity <= 1}
+                    >
+                      -
+                    </Button>
+                    <span className="w-8 text-center text-sm font-medium">
+                      {item.quantity}
+                    </span>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-6 w-6 rounded-full hover:bg-gray-100"
+                      onClick={() =>
+                        updateCartItem({
+                          productId: item.id,
+                          quantity: item.quantity + 1,
+                        })
+                      }
+                    >
+                      +
+                    </Button>
+                  </div>
+
+                  <div className="flex items-center justify-end">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-7 text-xs"
+                      onClick={() => removeFromCart(item.id)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                </div>
+              </div>
             </div>
-            <p className="font-medium">
-              ${(item.price * item.quantity).toFixed(2)}
-            </p>
+          ))}
+        </div>
+      </ScrollArea>
+
+      <div className="space-y-4 pt-4">
+        <div className="space-y-3">
+          <div className="flex justify-between text-sm py-0.5">
+            <span>items Subtotal</span>
+            <span>{formatPrice(subtotal)}</span>
           </div>
-        ))}
-      </div>
-
-      <Separator />
-
-      <div className="space-y-2">
-        <div className="flex justify-between">
-          <span>Subtotal ({totalItems} items)</span>
-          <span>${subtotal.toFixed(2)}</span>
+          {subtotal > 0 && (
+            <div className="flex justify-between text-sm py-0.5">
+              <span>Delivery</span>
+              <span>{formatPrice(DELIVERY_FEE)}</span>
+            </div>
+          )}
+          <div className="flex justify-between font-medium py-0.5">
+            <span>Total</span>
+            <span>{formatPrice(total)}</span>
+          </div>
         </div>
-        <div className="flex justify-between">
-          <span>Shipping</span>
-          <span>${shipping.toFixed(2)}</span>
-        </div>
+        {!hideCheckoutButton && (
+          <div className="space-y-2 pt-6">
+            <Button
+              className="w-full bg-orange-500 hover:bg-orange-600"
+              onClick={onCheckout}
+              disabled={total === 0 || isCheckingOut}
+            >
+              {isCheckingOut ? 'Processing...' : 'Complete Order'}
+            </Button>
+          </div>
+        )}
       </div>
-
-      <Separator />
-
-      <div className="flex justify-between text-lg font-semibold">
-        <span>Total</span>
-        <span>${total.toFixed(2)}</span>
-      </div>
-
-      {!hideCheckoutButton && (
-        <Button
-          onClick={onCheckout}
-          disabled={isCheckingOut}
-          className="w-full"
-          size="lg"
-        >
-          {isCheckingOut ? 'Processing...' : `Checkout $${total.toFixed(2)}`}
-        </Button>
-      )}
     </div>
   )
 }
