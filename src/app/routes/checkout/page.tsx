@@ -52,24 +52,14 @@ export default function CheckoutPage() {
     try {
       await checkout(formData)
 
-      // Show immediate success toast
-      toast.success('🎉 Order Confirmed!', {
-        description: `Your order for $${total.toFixed(2)} has been successfully processed. Thank you for your purchase!`,
-        action: {
-          label: 'Continue Shopping',
-          onClick: () => navigate('/products'),
+      // Navigate to success page with order data
+      navigate('/checkout/success', {
+        state: {
+          orderTotal: total,
+          checkoutData: formData,
         },
-        duration: 8000,
+        replace: true, // Replace current history entry
       })
-
-      // Store checkout data for reference
-      localStorage.setItem('lastOrderTotal', total.toString())
-      localStorage.setItem('lastCheckoutData', JSON.stringify(formData))
-
-      // Redirect to products after a short delay
-      setTimeout(() => {
-        navigate('/products')
-      }, 3000)
     } catch (error: unknown) {
       console.error('Checkout failed:', error)
       const errorMessage =
