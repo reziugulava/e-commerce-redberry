@@ -1,4 +1,5 @@
 import { api } from '@/lib/api/axios'
+import { AxiosError } from 'axios'
 import type {
   LoginData,
   RegisterData,
@@ -34,10 +35,12 @@ export const authApi = {
     try {
       const response = await api.put<AuthResponse>('/user', data)
       return response.data
-    } catch (error: any) {
+    } catch (error: unknown) {
       // If endpoint doesn't exist, throw a more helpful error
-      if (error.response?.status === 404) {
-        throw new Error('Profile update is not supported by the current API version')
+      if (error instanceof AxiosError && error.response?.status === 404) {
+        throw new Error(
+          'Profile update is not supported by the current API version'
+        )
       }
       throw error
     }
@@ -51,14 +54,16 @@ export const authApi = {
     try {
       const response = await api.post<AuthResponse>('/user/avatar', formData)
       return response.data
-    } catch (error: any) {
+    } catch (error: unknown) {
       // Try alternative endpoint
-      if (error.response?.status === 404) {
+      if (error instanceof AxiosError && error.response?.status === 404) {
         try {
           const response = await api.patch<AuthResponse>('/user', formData)
           return response.data
-        } catch (secondError: any) {
-          throw new Error('Avatar update is not supported by the current API version')
+        } catch (secondError: unknown) {
+          throw new Error(
+            'Avatar update is not supported by the current API version'
+          )
         }
       }
       throw error

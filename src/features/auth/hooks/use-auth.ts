@@ -11,11 +11,12 @@ export function useLogin() {
   return useMutation({
     mutationFn: (data: LoginData) => authApi.login(data),
     onSuccess: data => {
-      console.log('Login successful, received user data:', data.user)
-      console.log('User profile_photo:', data.user.profile_photo)
       setUser(data.user)
       setToken(data.token)
       navigate('/')
+    },
+    onError: () => {
+      // Don't navigate on error - let the error be displayed in the form
     },
   })
 }
@@ -27,23 +28,12 @@ export function useRegister() {
   return useMutation({
     mutationFn: (data: RegisterData) => authApi.register(data),
     onSuccess: data => {
-      console.log('Registration successful, received user data:', data.user)
-      console.log('User profile_photo:', data.user.profile_photo)
       setUser(data.user)
       setToken(data.token)
       navigate('/')
     },
-    onError: (error: any) => {
-      console.error('Registration error:', error)
-      // Log more details about the error
-      if (error.response) {
-        console.error('Response status:', error.response.status)
-        console.error('Response data:', error.response.data)
-      } else if (error.request) {
-        console.error('Request made but no response:', error.request)
-      } else {
-        console.error('Error message:', error.message)
-      }
+    onError: () => {
+      // Don't navigate on error - let the error be displayed in the form
     },
   })
 }
@@ -66,7 +56,7 @@ export function useUpdateProfile() {
   const { setUser, setToken } = useUserStore()
 
   return useMutation({
-    mutationFn: (data: { username?: string; email?: string }) => 
+    mutationFn: (data: { username?: string; email?: string }) =>
       authApi.updateProfile(data),
     onSuccess: data => {
       // Update both user and token since profile changes might affect authentication

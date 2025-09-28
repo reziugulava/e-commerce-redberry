@@ -80,8 +80,12 @@ export default function CartPage() {
                       {/* Display variant info if available */}
                       {(item.selected_color || item.selected_size) && (
                         <div className="flex gap-2 text-sm text-gray-500 mt-1">
-                          {item.selected_color && <span>Color: {item.selected_color}</span>}
-                          {item.selected_size && <span>Size: {item.selected_size}</span>}
+                          {item.selected_color && (
+                            <span>Color: {item.selected_color}</span>
+                          )}
+                          {item.selected_size && (
+                            <span>Size: {item.selected_size}</span>
+                          )}
                         </div>
                       )}
                       <p className="text-lg font-semibold text-green-600 mt-1">
@@ -95,7 +99,11 @@ export default function CartPage() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          handleQuantityChange(item.cartItemKey || item.id.toString(), item.quantity, -1)
+                          handleQuantityChange(
+                            item.cartItemKey || item.id.toString(),
+                            item.quantity,
+                            -1
+                          )
                         }
                         disabled={isUpdatingCart}
                         className="h-8 w-8 p-0"
@@ -109,7 +117,11 @@ export default function CartPage() {
                         variant="outline"
                         size="sm"
                         onClick={() =>
-                          handleQuantityChange(item.cartItemKey || item.id.toString(), item.quantity, 1)
+                          handleQuantityChange(
+                            item.cartItemKey || item.id.toString(),
+                            item.quantity,
+                            1
+                          )
                         }
                         disabled={isUpdatingCart}
                         className="h-8 w-8 p-0"
@@ -129,7 +141,9 @@ export default function CartPage() {
                     <Button
                       variant="ghost"
                       size="sm"
-                      onClick={() => handleRemoveItem(item.cartItemKey || item.id.toString())}
+                      onClick={() =>
+                        handleRemoveItem(item.cartItemKey || item.id.toString())
+                      }
                       disabled={isRemovingFromCart}
                       className="text-red-500 hover:text-red-700"
                     >

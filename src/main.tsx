@@ -7,8 +7,8 @@ import { router } from './app/router'
 
 createRoot(document.getElementById('root')!).render(
   // <StrictMode>
-    <Providers>
-      <RouterProvider router={router} />
-    </Providers>
+  <Providers>
+    <RouterProvider router={router} />
+  </Providers>
   // </StrictMode>
 )

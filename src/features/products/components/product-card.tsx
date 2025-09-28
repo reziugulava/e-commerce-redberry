@@ -6,7 +6,6 @@ interface ProductCardProps {
 }
 
 export const ProductCard = ({ product }: ProductCardProps) => {
-  console.log('Product in card:', product) // Debug log
   return (
     <Link
       to={`/products/${product.id}`}
@@ -18,7 +17,6 @@ export const ProductCard = ({ product }: ProductCardProps) => {
           alt={product.name}
           className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
           onError={e => {
-            console.error('Image load error:', e)
             const img = e.target as HTMLImageElement
             img.src = 'https://placehold.co/400x400?text=Product+Image'
           }}

@@ -11,6 +11,7 @@ import {
   FormItem,
   FormMessage,
 } from '@/components/ui/form'
+import { Mail } from 'lucide-react'
 import type { CheckoutFormData } from '../types/checkout'
 
 const checkoutFormSchema = z.object({
@@ -113,13 +114,16 @@ export function CheckoutForm({
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <Input
-                    type="email"
-                    placeholder="email address"
-                    {...field}
-                    disabled={isLoading}
-                    className="bg-white w-129"
-                  />
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                    <Input
+                      type="email"
+                      placeholder="email address"
+                      {...field}
+                      disabled={isLoading}
+                      className="bg-white w-129 pl-10"
+                    />
+                  </div>
                 </FormControl>
                 <FormMessage />
               </FormItem>

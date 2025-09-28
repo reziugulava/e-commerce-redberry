@@ -101,8 +101,7 @@ export default function ProductDetailPage() {
       })
       // Stay on current page - user can access cart via sidebar
     } catch (error) {
-      console.error('Failed to add to cart:', error)
-      toast.error('Failed to add to cart. Please try again.')
+      toast.error('Failed to add product to cart')
     }
   }
 
@@ -118,7 +117,8 @@ export default function ProductDetailPage() {
             <h1 className="text-4xl font-bold">{product.name}</h1>
             <div className="mt-4 flex items-center gap-4">
               <div className="text-2xl font-bold">${product.price}</div>
-              {(!product.available_colors?.length || !product.available_sizes?.length) && (
+              {(!product.available_colors?.length ||
+                !product.available_sizes?.length) && (
                 <span className="inline-flex items-center rounded-full bg-red-100 px-3 py-1 text-sm font-medium text-red-800">
                   Out of Stock
                 </span>

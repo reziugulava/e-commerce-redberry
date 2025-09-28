@@ -1,9 +1,6 @@
 import { useEffect, useCallback } from 'react'
 import { Button } from '@/components/ui/button'
-import {
-  Dialog,
-  DialogContent,
-} from '@/components/ui/dialog'
+import { Dialog, DialogContent } from '@/components/ui/dialog'
 import type { CheckoutFormData } from '@/features/checkout/types/checkout'
 
 interface CheckoutSuccessState {
@@ -63,7 +60,14 @@ export function CheckoutSuccessModal({
         <div className="text-center">
           <Button
             onClick={handleContinueShopping}
-            className="px-8 py-4 text-lg bg-orange-500 hover:bg-orange-600"
+            className="px-8 py-4 text-lg text-white"
+            style={{ backgroundColor: '#FF4000' }}
+            onMouseEnter={e =>
+              (e.currentTarget.style.backgroundColor = '#E6390A')
+            }
+            onMouseLeave={e =>
+              (e.currentTarget.style.backgroundColor = '#FF4000')
+            }
             size="lg"
           >
             Continue Shopping

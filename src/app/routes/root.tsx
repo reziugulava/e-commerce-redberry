@@ -5,7 +5,7 @@ import { useUserStore } from '@/features/auth/stores/user'
 import { Button } from '@/components/ui/button'
 import { CartProvider } from '@/features/cart/components/cart-provider'
 import { CartSidebar } from '@/features/cart/components/cart-sidebar'
-import { ShoppingCart } from 'lucide-react'
+import { ShoppingCart, User } from 'lucide-react'
 import { useCart } from '@/features/cart/hooks/use-cart'
 
 export default function RootLayout() {
@@ -35,10 +35,10 @@ export default function RootLayout() {
           ) : (
             <div className="flex items-center gap-2">
               <Link to="/login">
-                <Button variant="ghost">Login</Button>
-              </Link>
-              <Link to="/register">
-                <Button>Register</Button>
+                <Button variant="ghost" className="flex items-center gap-2">
+                  <User className="h-4 w-4" />
+                  Login
+                </Button>
               </Link>
             </div>
           )}

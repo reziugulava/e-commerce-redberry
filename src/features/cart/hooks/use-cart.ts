@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
+import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 import {
   addToCart,
@@ -66,20 +67,12 @@ export function useCart() {
 
       // We'll let the onSuccess callback handle localStorage updates
       // and onSettled will trigger a fresh fetch
-      
+
       return { previousCart }
     },
     onSuccess: (_data, { productId, payload, productData }) => {
-      const callId = Math.random().toString(36).substr(2, 9)
-      console.log(`🚀 addToCartMutation onSuccess called [${callId}]:`, {
-        productId,
-        payload,
-        productData
-      })
-      
       // Store product selection data in localStorage only after successful API call
       if (productData) {
-        console.log(`📝 Calling setCartSelection [${callId}]`)
         setCartSelection({
           productId,
           selected_color: productData.selected_color,
@@ -89,9 +82,9 @@ export function useCart() {
         })
       }
     },
-    onError: (error: any, _variables, context) => {
+    onError: (error: unknown, _variables, context) => {
       // If 401 unauthorized, redirect to login
-      if (error?.response?.status === 401) {
+      if (error instanceof AxiosError && error.response?.status === 401) {
         navigate('/login')
       }
       if (context?.previousCart) {
@@ -147,7 +140,9 @@ export function useCart() {
       const previousCart =
         queryClient.getQueryData<CartItem[]>(CART_QUERY_KEY) ?? []
 
-      const newCart = previousCart.filter(item => item.cartItemKey !== cartItemKey)
+      const newCart = previousCart.filter(
+        item => item.cartItemKey !== cartItemKey
+      )
       queryClient.setQueryData(CART_QUERY_KEY, newCart)
 
       return { previousCart }

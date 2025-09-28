@@ -7,24 +7,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { Button } from '@/components/ui/button'
-import { User, RefreshCw } from 'lucide-react'
-import { useLogout, useCurrentUser } from '../hooks/use-auth'
+import { User } from 'lucide-react'
+import { useLogout } from '../hooks/use-auth'
 import { useUserStore } from '../stores/user'
-import { ProfileSettings } from './profile-settings'
 
 export function UserNav() {
   const user = useUserStore(state => state.user)
   const logout = useLogout()
-  const { mutate: refreshUser, isPending } = useCurrentUser()
 
   if (!user) return null
-
-  const handleRefreshUser = () => {
-    refreshUser()
-  }
-
-  // Debug log to check if profile_photo is available
-  console.log('User in UserNav:', user)
 
   const displayName = user.name || user.username || 'User'
 
@@ -38,9 +29,7 @@ export function UserNav() {
                 src={user.profile_photo}
                 alt={displayName}
                 className="w-full h-full object-cover"
-                onError={(e) => {
-                  console.error('Avatar failed to load:', user.profile_photo)
-                  // Hide the broken image and show default icon
+                onError={e => {
                   e.currentTarget.style.display = 'none'
                 }}
               />
@@ -60,9 +49,7 @@ export function UserNav() {
                     src={user.profile_photo}
                     alt={displayName}
                     className="w-full h-full object-cover"
-                    onError={(e) => {
-                      console.error('Avatar failed to load in dropdown:', user.profile_photo)
-                      // Hide the broken image and show default icon
+                    onError={e => {
                       e.currentTarget.style.display = 'none'
                     }}
                   />
@@ -82,15 +69,9 @@ export function UserNav() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={handleRefreshUser} disabled={isPending}>
-          <RefreshCw className="mr-2 h-4 w-4" />
-          {isPending ? 'Refreshing...' : 'Refresh Profile'}
-        </DropdownMenuItem>
         {user.is_admin === 1 && (
           <DropdownMenuItem>Admin Dashboard</DropdownMenuItem>
         )}
-        <ProfileSettings />
-        <DropdownMenuSeparator />
         <DropdownMenuItem onClick={logout}>Log out</DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

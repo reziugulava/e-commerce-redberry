@@ -115,7 +115,9 @@ export function CheckoutSummary({
                       variant="ghost"
                       size="sm"
                       className="h-7 text-xs"
-                      onClick={() => removeFromCart(item.cartItemKey || item.id.toString())}
+                      onClick={() =>
+                        removeFromCart(item.cartItemKey || item.id.toString())
+                      }
                     >
                       Remove
                     </Button>
@@ -147,7 +149,14 @@ export function CheckoutSummary({
         {!hideCheckoutButton && (
           <div className="space-y-2 pt-6">
             <Button
-              className="w-full bg-orange-500 hover:bg-orange-600"
+              className="w-full text-white"
+              style={{ backgroundColor: '#FF4000' }}
+              onMouseEnter={e =>
+                (e.currentTarget.style.backgroundColor = '#E6390A')
+              }
+              onMouseLeave={e =>
+                (e.currentTarget.style.backgroundColor = '#FF4000')
+              }
               onClick={onCheckout}
               disabled={total === 0 || isCheckingOut}
             >

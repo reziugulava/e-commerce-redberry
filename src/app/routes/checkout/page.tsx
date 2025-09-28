@@ -43,13 +43,6 @@ export default function CheckoutPage() {
     setLocalError(null)
     const total = calculateTotal()
 
-    console.log('Cart items before checkout:', cart)
-    console.log('Cart length:', cart.length)
-    console.log('Total:', total)
-    console.log('User:', user)
-    console.log('Token:', token ? 'Present' : 'Missing')
-    console.log('Form data:', formData)
-
     // Check if user is authenticated
     if (!token) {
       setLocalError('You must be logged in to checkout.')
@@ -67,7 +60,6 @@ export default function CheckoutPage() {
       })
       setShowSuccessModal(true)
     } catch (error: unknown) {
-      console.error('Checkout failed:', error)
       const errorMessage =
         error instanceof Error
           ? error.message

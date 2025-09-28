@@ -51,7 +51,7 @@ export const parseCartItemKey = (
   const productId = parseInt(parts[0], 10)
   const color = parts[1] === 'no-color' ? undefined : parts[1]
   const size = parts[2] === 'no-size' ? undefined : parts[2]
-  
+
   return { productId, color, size }
 }
 
@@ -91,7 +91,7 @@ export const setCartSelection = (
 ): void => {
   try {
     const selections = getCartSelections()
-    
+
     // Find existing variant with same product ID, color, AND size
     const existingIndex = selections.findIndex(
       s =>
@@ -104,7 +104,7 @@ export const setCartSelection = (
       incoming: selection,
       existingIndex,
       existingCount: selections.length,
-      existing: existingIndex >= 0 ? selections[existingIndex] : null
+      existing: existingIndex >= 0 ? selections[existingIndex] : null,
     })
 
     const newSelection: CartItemSelection = {
@@ -116,29 +116,31 @@ export const setCartSelection = (
       // Same variant exists - check if this might be a duplicate call
       const existing = selections[existingIndex]
       const timeSinceLastUpdate = Date.now() - existing.timestamp
-      
+
       // If updated very recently (within 100ms), it might be a duplicate call from React StrictMode
       if (timeSinceLastUpdate < 100) {
-        console.log('🚫 Skipping potential duplicate call - updated very recently')
+        console.log(
+          '🚫 Skipping potential duplicate call - updated very recently'
+        )
         return
       }
-      
+
       // Normal case: increment the quantity
       const existingQuantity = existing.quantity || 1
       const addQuantity = selection.quantity || 1
       const newQuantity = existingQuantity + addQuantity
-      
+
       selections[existingIndex] = {
         ...newSelection,
         quantity: newQuantity,
       }
-      
+
       console.log('🔄 Updated existing variant:', {
         variant: `${selection.productId}-${selection.selected_color}-${selection.selected_size}`,
         existingQuantity,
         addQuantity,
         newQuantity,
-        timeSinceLastUpdate
+        timeSinceLastUpdate,
       })
     } else {
       // New variant - add as separate entry
@@ -147,10 +149,10 @@ export const setCartSelection = (
         ...newSelection,
         quantity,
       })
-      
+
       console.log('✅ Added new variant:', {
         variant: `${selection.productId}-${selection.selected_color}-${selection.selected_size}`,
-        quantity
+        quantity,
       })
     }
 
@@ -233,7 +235,10 @@ export const removeCartItemSelection = (
     )
     localStorage.setItem(CART_SELECTIONS_KEY, JSON.stringify(filtered))
   } catch (error) {
-    console.error('Error removing cart item selection from localStorage:', error)
+    console.error(
+      'Error removing cart item selection from localStorage:',
+      error
+    )
   }
 }
 

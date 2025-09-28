@@ -153,7 +153,7 @@ export const removeCartItemVariant = async (
 
     // Update backend with new total quantity
     await api.patch(`/cart/products/${productId}`, { quantity: totalQuantity })
-    
+
     // Update localStorage by removing the specific variant
     localStorage.setItem('cart_selections', JSON.stringify(remainingSelections))
   }
@@ -165,34 +165,33 @@ export const removeCartItemVariant = async (
  * @throws 401 Unauthorized - User is not authenticated
  */
 export const getCart = async (): Promise<CartItem[]> => {
-  const callId = Math.random().toString(36).substr(2, 9)
   const { data } = await api.get('/cart')
-
-  console.log(`🔍 getCart API response [${callId}]:`, data)
 
   // Since the backend only stores one item per product ID, we need to simulate
   // multiple variants by matching them with localStorage selections
   const allSelections = getCartSelections()
-  console.log(`🔍 localStorage selections [${callId}]:`, allSelections)
-  
+
   const cartItems: CartItem[] = []
 
   // Group selections by product ID
-  const selectionsByProduct = allSelections.reduce((acc: Record<number, CartItemSelection[]>, selection: CartItemSelection) => {
-    if (!acc[selection.productId]) {
-      acc[selection.productId] = []
-    }
-    acc[selection.productId].push(selection)
-    return acc
-  }, {} as Record<number, CartItemSelection[]>)
-
-  console.log(`🔍 selectionsByProduct [${callId}]:`, selectionsByProduct)
+  const selectionsByProduct = allSelections.reduce(
+    (
+      acc: Record<number, CartItemSelection[]>,
+      selection: CartItemSelection
+    ) => {
+      if (!acc[selection.productId]) {
+        acc[selection.productId] = []
+      }
+      acc[selection.productId].push(selection)
+      return acc
+    },
+    {} as Record<number, CartItemSelection[]>
+  )
 
   // For each item from the API, create cart items for each variant stored in localStorage
   data.forEach((apiItem: CartItem) => {
     const selections = selectionsByProduct[apiItem.id] || []
-    console.log(`🔍 Processing API item ${apiItem.id}, found ${selections.length} variants [${callId}]`)
-    
+
     if (selections.length === 0) {
       // No specific selections, create a default item
       cartItems.push({
@@ -215,7 +214,7 @@ export const getCart = async (): Promise<CartItem[]> => {
           // Use the quantity stored in localStorage for this specific variant
           quantity: selection.quantity,
         }
-        console.log(`🔍 Created cart item [${callId}]:`, cartItem)
+
         cartItems.push(cartItem)
       })
     }
@@ -227,16 +226,15 @@ export const getCart = async (): Promise<CartItem[]> => {
 
   // Deduplicate cart items by cartItemKey (this shouldn't be necessary, but ensures no duplicates)
   const uniqueCartItems = cartItems.reduce((acc: CartItem[], item) => {
-    const existingIndex = acc.findIndex(existing => existing.cartItemKey === item.cartItemKey)
+    const existingIndex = acc.findIndex(
+      existing => existing.cartItemKey === item.cartItemKey
+    )
     if (existingIndex === -1) {
       acc.push(item)
-    } else {
-      console.warn(`🚫 Duplicate cart item detected and removed [${callId}]:`, item.cartItemKey)
     }
     return acc
   }, [])
 
-  console.log(`🔍 Final cart items [${callId}]:`, uniqueCartItems)
   return uniqueCartItems
 }
 
@@ -269,12 +267,6 @@ export const checkout = async (
     return data
   } catch (error: unknown) {
     const axiosError = error as AxiosErrorResponse
-    console.error('Checkout error details:', {
-      status: axiosError.response?.status,
-      statusText: axiosError.response?.statusText,
-      data: axiosError.response?.data,
-      message: axiosError.message || 'Unknown error',
-    })
 
     // Provide more specific error messages based on status code
     if (axiosError.response?.status === 422) {

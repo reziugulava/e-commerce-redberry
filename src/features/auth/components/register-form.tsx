@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { Eye, EyeOff, User } from 'lucide-react'
+import { getRegisterErrorMessage } from '../utils/error-messages'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -66,13 +67,6 @@ export function RegisterForm() {
   })
 
   const onSubmit = (data: RegisterData) => {
-    console.log('Registration form submitted with data:', {
-      email: data.email,
-      username: data.username,
-      hasAvatar: !!data.avatar,
-      avatarSize: data.avatar?.size,
-      avatarType: data.avatar?.type
-    })
     register(data)
   }
 
@@ -267,18 +261,8 @@ export function RegisterForm() {
                 />
 
                 {error && (
-                  <div className="text-sm text-red-500 p-3 bg-red-50 rounded-md">
-                    <div className="font-medium">Registration failed:</div>
-                    <div className="mt-1">
-                      {(error as any)?.response?.data?.message || 
-                       (error as Error).message || 
-                       'Network error - please check your connection and try again'}
-                    </div>
-                    {(error as any)?.response?.status && (
-                      <div className="text-xs mt-1 opacity-75">
-                        Status: {(error as any).response.status}
-                      </div>
-                    )}
+                  <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-md p-3">
+                    {getRegisterErrorMessage(error)}
                   </div>
                 )}
 

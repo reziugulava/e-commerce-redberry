@@ -76,9 +76,7 @@ export function ProductOptions({
     <div className="space-y-6">
       {/* Color Selection */}
       <div className="space-y-4">
-        <Label>
-          Color{selectedColor ? `: ${selectedColor}` : ''}
-        </Label>
+        <Label>Color{selectedColor ? `: ${selectedColor}` : ''}</Label>
         <RadioGroup
           onValueChange={handleColorChange}
           value={selectedColor}
@@ -154,7 +152,10 @@ export function ProductOptions({
       <Button
         onClick={handleAddToCart}
         disabled={!selectedColor || !selectedSize || isLoading}
-        className="w-full bg-orange-600 hover:bg-orange-700 text-white"
+        className="w-full text-white"
+        style={{ backgroundColor: '#FF4000' }}
+        onMouseEnter={e => (e.currentTarget.style.backgroundColor = '#E6390A')}
+        onMouseLeave={e => (e.currentTarget.style.backgroundColor = '#FF4000')}
         size="lg"
       >
         {isLoading ? 'Adding to Cart...' : 'Add to Cart'}

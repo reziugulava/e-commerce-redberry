@@ -100,10 +100,32 @@ export const Pagination = ({
               size="sm"
               onClick={() => onPageChange(pageNumber)}
               className={`min-w-[2.5rem] ${
-                isCurrentPage
-                  ? '!border-orange-500 text-orange-500 bg-transparent hover:!border-orange-500 hover:text-orange-500 hover:bg-transparent'
-                  : 'hover:bg-gray-100'
+                isCurrentPage ? 'bg-transparent' : 'hover:bg-gray-100'
               }`}
+              style={
+                isCurrentPage
+                  ? {
+                      borderColor: '#FF4000',
+                      color: '#FF4000',
+                    }
+                  : undefined
+              }
+              onMouseEnter={
+                isCurrentPage
+                  ? e => {
+                      e.currentTarget.style.borderColor = '#FF4000'
+                      e.currentTarget.style.color = '#FF4000'
+                    }
+                  : undefined
+              }
+              onMouseLeave={
+                isCurrentPage
+                  ? e => {
+                      e.currentTarget.style.borderColor = '#FF4000'
+                      e.currentTarget.style.color = '#FF4000'
+                    }
+                  : undefined
+              }
             >
               {pageNumber}
             </Button>

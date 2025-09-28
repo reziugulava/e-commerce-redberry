@@ -47,8 +47,10 @@ export function ProfileSettings() {
   const [selectedAvatar, setSelectedAvatar] = useState<File | null>(null)
   const [isOpen, setIsOpen] = useState(false)
 
-  const { mutate: updateProfile, isPending: isUpdatingProfile } = useUpdateProfile()
-  const { mutate: updateAvatar, isPending: isUpdatingAvatar } = useUpdateAvatar()
+  const { mutate: updateProfile, isPending: isUpdatingProfile } =
+    useUpdateProfile()
+  const { mutate: updateAvatar, isPending: isUpdatingAvatar } =
+    useUpdateAvatar()
 
   const form = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
@@ -66,7 +68,7 @@ export function ProfileSettings() {
         toast.success('Profile updated successfully')
         setIsOpen(false)
       },
-      onError: (error) => {
+      onError: error => {
         toast.error(error.message || 'Failed to update profile')
       },
     })
@@ -104,7 +106,7 @@ export function ProfileSettings() {
         setAvatarPreview(null)
         setSelectedAvatar(null)
       },
-      onError: (error) => {
+      onError: error => {
         toast.error(error.message || 'Failed to update avatar')
       },
     })
@@ -129,7 +131,7 @@ export function ProfileSettings() {
             Update your profile information and avatar.
           </DialogDescription>
         </DialogHeader>
-        
+
         <div className="space-y-6">
           {/* Avatar Section */}
           <div className="flex items-center space-x-4">
@@ -210,7 +212,11 @@ export function ProfileSettings() {
                   <FormItem>
                     <FormLabel>Email</FormLabel>
                     <FormControl>
-                      <Input placeholder="Enter your email" type="email" {...field} />
+                      <Input
+                        placeholder="Enter your email"
+                        type="email"
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -47,16 +47,25 @@ export function CartSidebar({ children }: CartSidebarProps) {
         ) : cart?.length === 0 ? (
           <div className="flex-1 flex flex-col items-center justify-start pt-40 space-y-6">
             <div className="text-center space-y-4">
-              <img 
-                src="/empty-cart.png" 
-                alt="Empty cart" 
+              <img
+                src="/empty-cart.png"
+                alt="Empty cart"
                 className="w-30 h-24 mx-auto mb-4"
               />
               <h2 className="text-4xl font-bold text-gray-800">Ooops!</h2>
-              <div className="text-muted-foreground">You've got nothing in your cart just yet...</div>
+              <div className="text-muted-foreground">
+                You've got nothing in your cart just yet...
+              </div>
             </div>
             <Button
-              className="bg-orange-500 hover:bg-orange-600 text-white px-8 py-2"
+              className="text-white px-8 py-2"
+              style={{ backgroundColor: '#FF4000' }}
+              onMouseEnter={e =>
+                (e.currentTarget.style.backgroundColor = '#E6390A')
+              }
+              onMouseLeave={e =>
+                (e.currentTarget.style.backgroundColor = '#FF4000')
+              }
               onClick={() => navigate('/products')}
             >
               Start Shopping
@@ -117,7 +126,8 @@ export function CartSidebar({ children }: CartSidebarProps) {
                             className="h-6 w-6 rounded-full hover:bg-gray-100"
                             onClick={() =>
                               updateCartItem({
-                                cartItemKey: item.cartItemKey || item.id.toString(),
+                                cartItemKey:
+                                  item.cartItemKey || item.id.toString(),
                                 quantity: item.quantity - 1,
                               })
                             }
@@ -134,7 +144,8 @@ export function CartSidebar({ children }: CartSidebarProps) {
                             className="h-6 w-6 rounded-full hover:bg-gray-100"
                             onClick={() =>
                               updateCartItem({
-                                cartItemKey: item.cartItemKey || item.id.toString(),
+                                cartItemKey:
+                                  item.cartItemKey || item.id.toString(),
                                 quantity: item.quantity + 1,
                               })
                             }
@@ -148,7 +159,11 @@ export function CartSidebar({ children }: CartSidebarProps) {
                             variant="ghost"
                             size="sm"
                             className="h-7 text-xs"
-                            onClick={() => removeFromCart(item.cartItemKey || item.id.toString())}
+                            onClick={() =>
+                              removeFromCart(
+                                item.cartItemKey || item.id.toString()
+                              )
+                            }
                           >
                             Remove
                           </Button>
@@ -179,7 +194,14 @@ export function CartSidebar({ children }: CartSidebarProps) {
               </div>
               <div className="space-y-2 pt-15">
                 <Button
-                  className="w-full bg-orange-500 hover:bg-orange-600"
+                  className="w-full text-white"
+                  style={{ backgroundColor: '#FF4000' }}
+                  onMouseEnter={e =>
+                    (e.currentTarget.style.backgroundColor = '#E6390A')
+                  }
+                  onMouseLeave={e =>
+                    (e.currentTarget.style.backgroundColor = '#FF4000')
+                  }
                   onClick={handleCheckout}
                   disabled={total === 0}
                 >

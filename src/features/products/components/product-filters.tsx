@@ -112,12 +112,19 @@ export const ProductFilters = ({
                   />
                 </div>
               </div>
-              
+
               {/* Apply Button */}
               <div className="pt-2">
                 <Button
                   onClick={applyFilters}
-                  className="w-full bg-orange-500 hover:bg-orange-600 text-white font-medium"
+                  className="w-full text-white font-medium"
+                  style={{ backgroundColor: '#FF4000' }}
+                  onMouseEnter={e =>
+                    (e.currentTarget.style.backgroundColor = '#E6390A')
+                  }
+                  onMouseLeave={e =>
+                    (e.currentTarget.style.backgroundColor = '#FF4000')
+                  }
                 >
                   Apply
                 </Button>

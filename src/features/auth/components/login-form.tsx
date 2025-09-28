@@ -4,6 +4,7 @@ import { z } from 'zod'
 import { Link } from 'react-router-dom'
 import { useState } from 'react'
 import { Eye, EyeOff } from 'lucide-react'
+import { getAuthErrorMessage } from '../utils/error-messages'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -11,7 +12,6 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel,
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
@@ -24,7 +24,7 @@ const loginSchema = z.object({
 })
 
 export function LoginForm() {
-  const { mutate: login, isPending, error } = useLogin()
+  const { mutate: login, isPending, error, reset } = useLogin()
   const [showPassword, setShowPassword] = useState(false)
 
   const form = useForm<LoginData>({
@@ -35,7 +35,17 @@ export function LoginForm() {
     },
   })
 
+  // Reset mutation error when user starts typing
+  const handleInputChange = () => {
+    if (error) {
+      reset()
+    }
+  }
+
   const onSubmit = (data: LoginData) => {
+    // Prevent any default form behavior
+    // Clear any previous form errors
+    form.clearErrors()
     login(data)
   }
 
@@ -63,22 +73,26 @@ export function LoginForm() {
               <form
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="space-y-6"
+                noValidate
               >
                 <FormField
                   control={form.control}
                   name="email"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-medium">
-                        Email <span className="text-red-500">*</span>
-                      </FormLabel>
                       <FormControl>
-                        <Input
-                          placeholder="Enter your email"
-                          type="email"
-                          className="h-12"
-                          {...field}
-                        />
+                        <div className="relative">
+                          <Input
+                            placeholder="Email *"
+                            type="email"
+                            className="h-12"
+                            {...field}
+                            onChange={e => {
+                              field.onChange(e)
+                              handleInputChange()
+                            }}
+                          />
+                        </div>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -90,16 +104,17 @@ export function LoginForm() {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel className="text-base font-medium">
-                        Password <span className="text-red-500">*</span>
-                      </FormLabel>
                       <FormControl>
                         <div className="relative">
                           <Input
-                            placeholder="Enter your password"
+                            placeholder="Password *"
                             type={showPassword ? 'text' : 'password'}
                             className="h-12 pr-10"
                             {...field}
+                            onChange={e => {
+                              field.onChange(e)
+                              handleInputChange()
+                            }}
                           />
                           <button
                             type="button"
@@ -120,18 +135,27 @@ export function LoginForm() {
                 />
 
                 {error && (
-                  <div className="text-sm text-red-500">
-                    {(error as Error).message || 'An error occurred'}
+                  <div className="text-sm text-red-500 bg-red-50 border border-red-200 rounded-md p-3">
+                    {getAuthErrorMessage(error)}
                   </div>
                 )}
 
-                <Button
-                  type="submit"
-                  className="w-full h-12 bg-orange-500 hover:bg-orange-600 text-white font-medium text-base"
-                  disabled={isPending}
-                >
-                  {isPending ? 'Logging in...' : 'Login'}
-                </Button>
+                <div className="pt-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-white font-medium text-base"
+                    style={{ backgroundColor: '#FF4000' }}
+                    onMouseEnter={e =>
+                      (e.currentTarget.style.backgroundColor = '#E6390A')
+                    }
+                    onMouseLeave={e =>
+                      (e.currentTarget.style.backgroundColor = '#FF4000')
+                    }
+                    disabled={isPending}
+                  >
+                    {isPending ? 'Logging in...' : 'Login'}
+                  </Button>
+                </div>
               </form>
             </Form>
 

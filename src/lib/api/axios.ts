@@ -15,12 +15,12 @@ api.interceptors.request.use(config => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`
   }
-  
+
   // Only set JSON content-type if data is not FormData
   if (!(config.data instanceof FormData)) {
     config.headers['Content-Type'] = 'application/json'
   }
-  
+
   return config
 })
 
@@ -28,11 +28,20 @@ api.interceptors.request.use(config => {
 api.interceptors.response.use(
   response => response,
   error => {
-    if (error.response?.status === 401) {
+    // Only redirect to login on 401 if user is already logged in
+    // Don't redirect during login attempts
+    if (
+      error.response?.status === 401 &&
+      error.config?.url !== '/login' &&
+      localStorage.getItem('auth_token')
+    ) {
       localStorage.removeItem('auth_token')
       localStorage.removeItem('auth_user')
-      // Redirect to login page
-      if (typeof window !== 'undefined') {
+      // Redirect to login page only if not already on login page
+      if (
+        typeof window !== 'undefined' &&
+        !window.location.pathname.includes('/login')
+      ) {
         window.location.href = '/login'
       }
     }
