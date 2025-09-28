@@ -13,7 +13,7 @@ import { toast } from 'sonner'
 export default function CheckoutPage() {
   const navigate = useNavigate()
   const { cart = [], checkout, isCheckingOut, checkoutError } = useCart()
-  const { user} = useUserStore()
+  const token = useUserStore(state => state.token)
 
   const [localError, setLocalError] = useState<string | null>(null)
   const [showSuccessModal, setShowSuccessModal] = useState(false)
